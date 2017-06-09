@@ -31,9 +31,27 @@ plt.show()
 ### your code here!  name your classifier object clf if you want the 
 ### visualization code (prettyPicture) to show you the decision boundary
 
+from sklearn.neighbors import KNeighborsClassifier
+
+SETTING_N_NEIGHBORS = [2, 5, 10, 15, 30]
+SETTING_WEIGHTS = ["uniform", "distance"]
+SETTINGS_ALGORITHM = {"auto", "ball_tree", "kd_tree", "brute"}
 
 
+for n_neighbors in SETTING_N_NEIGHBORS:
+    for weights in SETTING_WEIGHTS:
+        for algorithm in SETTINGS_ALGORITHM:
+            clf = KNeighborsClassifier(
+                n_neighbors=n_neighbors,
+                algorithm=algorithm,
+                weights=weights
+            )
+            clf.fit(features_train, labels_train)
 
+            print "n_neighbors: \t", n_neighbors
+            print "weights: \t", weights
+            print "algorithm: \t", algorithm
+            print "accuray: ", clf.score(features_test, labels_test)
 
 
 

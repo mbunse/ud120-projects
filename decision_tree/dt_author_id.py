@@ -24,8 +24,16 @@ features_train, features_test, labels_train, labels_test = preprocess()
 
 #########################################################
 ### your code goes here ###
+from sklearn import tree
 
+MIN_SPLIT_SETTINGS = [40]
+acc = {}
+for min_split in MIN_SPLIT_SETTINGS:
+    clf = tree.DecisionTreeClassifier(min_samples_split=min_split)
+    clf.fit(features_train, labels_train)
+    acc[min_split] = clf.score(features_test, labels_test)
 
+print acc
 #########################################################
 
 

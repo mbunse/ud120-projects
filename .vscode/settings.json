@@ -1,0 +1,6 @@
+// Platzieren Sie Ihre Einstellungen in dieser Datei, um Standard- und Benutzereinstellungen zu überschreiben.
+{
+    "python.pythonPath": "C:\\Users\\Moritz\\Anaconda3\\envs\\Udacity_ML_mini 1\\python.exe",
+    "python.linting.pylintPath": "C:\\Users\\Moritz\\Anaconda3\\envs\\Udacity_ML_mini 1\\Scripts\\pylint.exe",
+    "python.terminal.executeInFileDir": true
+}
