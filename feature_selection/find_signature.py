@@ -38,6 +38,21 @@ labels_train   = labels_train[:150]
 
 
 ### your code goes here
+from sklearn import tree
+clf = tree.DecisionTreeClassifier()
+clf.fit(features_train, labels_train)
+print "Acc: ", clf.score(features_test, labels_test)
+print "# train: ", len(labels_train)
 
+feature_list = []
+for index, feature_imp in enumerate(clf.feature_importances_):
+    if feature_imp > 0.02:
+        feature_list.append((index, feature_imp))
 
+feature_list = sorted(feature_list, key=lambda a: a[1], reverse=True)
 
+print "Top features: "
+for index, feature_imp in feature_list[:10]:
+    print "Index: \t", index, "\t\tImportance: \t", feature_imp
+
+print "Word feature with highest importance: ", vectorizer.get_feature_names()[feature_list[0][0]]
