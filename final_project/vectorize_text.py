@@ -62,7 +62,8 @@ def vectorize_email_text(email_addresses, poi_flags):
 
             print "emails from " + email_address + " processed"
         except IOError:
-            pass
+            word_data.append("")
+            from_data.append(poi_flag)
     pickle.dump(word_data, open("word_data.pkl", "w"))
     pickle.dump(from_data, open("email_authors.pkl", "w"))
 
@@ -77,8 +78,8 @@ def vectorize_email_text(email_addresses, poi_flags):
     print "Number of words: ", len(vectorizer.get_feature_names())
     print "Word number : ", vectorizer.get_feature_names()
 
-    pickle.dump( tfidf_word_data, open("your_tfidf_word_data.pkl", "w") )
-
+    pickle.dump(tfidf_word_data, open("your_tfidf_word_data.pkl", "w"))
+    pickle.dump(vectorizer, open("word_vectorizer.pkl", "w"))
     # tfidf_word_data = pickle.load(open("your_tfidf_word_data.pkl", "r"))
 
 def test():
