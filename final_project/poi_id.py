@@ -1,16 +1,20 @@
 #!/usr/bin/python
 
 import sys
+import os
 import pickle
-sys.path.append("../tools/")
-
 from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
+from sklearn import cross_validation
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_selection import SelectPercentile, f_classif
+import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import Pipeline
 
-### Task 1: Select what features you'll use.
-### features_list is a list of strings, each of which is a feature name.
-### The first feature must be "poi".
-features_financial = ['salary',
+from parse_out_email_text import parseOutText
+
+FEATURES_FINANCIAL = ['salary',
                       'deferral_payments',
                       'total_payments',
                       'loan_advances',
@@ -24,63 +28,183 @@ features_financial = ['salary',
                       'long_term_incentive',
                       'restricted_stock',
                       'director_fees']
-features_emails = ['to_messages',
-                   'from_poi_to_this_person',
-                   'from_messages',
-                   'from_this_person_to_poi',
-                   'shared_receipt_with_poi']
+FEATURES_EMAIL = ['to_messages',
+                  'from_poi_to_this_person',
+                  'from_messages',
+                  'from_this_person_to_poi',
+                  'shared_receipt_with_poi']
+TARGET = 'poi'
 
-target = 'poi'
-features_list = [target] + features_financial + features_emails
+class StripKeys(BaseEstimator, TransformerMixin):
+    """ transfrom enron data to features """
+    def __init__(self):
+        pass
+    def fit(self, x, y=None):
+        return self
 
-# was features_list = ['poi','salary'] # You will need to use more features
+    def transform(self, data_dict):
+        return data_dict.values()
 
-### Load the dictionary containing the dataset
-with open("final_project_dataset.pkl", "r") as data_file:
-    data_dict = pickle.load(data_file)
+class GetEmailText(BaseEstimator, TransformerMixin):
+    """ extract email texts for person """
+    def __init__(self):
+        pass
+    def fit(self, x, y=None):
+        return self
 
-### Task 2: Remove outliers
-for key, value in data_dict.items():
-    if value["salary"] <> "NaN" and value["salary"] > 1000000 and \
-        value["bonus"] <> "NaN" and value["bonus"] > 5000000:
-        del data_dict[key]
+    def transform(self, features):
+        """ concatenate all emails texts """
+        new_features = [] 
+        for item in features:
+            email_address = item["email_address"]
+            try:
+                with open("emails_by_address/from_" + email_address + ".txt", "r") as from_person:
+                    email_text = ""
+                    for path in from_person:
+                        path = path.replace("enron_mail_20110402/", "")
+                        path = os.path.join('..', path[:-1])
+                        print path
+                        email = open(path, "r")
 
-### Task 3: Create new feature(s)
-### Store to my_dataset for easy export below.
-my_dataset = data_dict
+                        ### Maybe use str.replace() to remove any instances of the words
+                        ### use parseOutText to extract the text from the opened email
+                        email_text = " ".join([email_text, parseOutText(email)])
+                        email.close()
+                    ### append the text to word_data
+                item["email_text"] = email_text
+            except IOError:
+                item["email_text"] = ""
+            new_features.append(item)
+        return new_features
 
-### Extract features and labels from dataset for local testing
-data = featureFormat(my_dataset, features_list, sort_keys = True)
-labels, features = targetFeatureSplit(data)
+class TfidfVectorizerForFeature(TfidfVectorizer):
+    
+    def __init__(self, word_data_key="email_text", **kwargs):
+        self.word_data_key = word_data_key
+        TfidfVectorizer.__init__(self, **kwargs)
+    
+    def transform(self, x):
+        word_data = [item[self.word_data_key] for item in x]
+        word_features = super(TfidfVectorizer, self).transform(word_data)
+        new_features = []
+        for idx, item in enumerate(x):
+            new_item = {}
+            for key, value in item:
+                if key != self.word_data_key:
+                    new_item[key] = value
+            new_item["word_features"]=word_features[idx]
+            new_features.append(new_item)
+        return new_features
 
-### Task 4: Try a varity of classifiers
-### Please name your classifier clf for easy export below.
-### Note that if you want to do PCA or other multi-stage operations,
-### you'll need to use Pipelines. For more info:
-### http://scikit-learn.org/stable/modules/pipeline.html
+    def fit(self, x, y=None):
+        fit_transform(self, x, y=None)
+        return self 
+    def fit_transform(self, x, y=None):
+        word_data = [item[self.word_data_key] for item in x]
+        word_features = super(TfidfVectorizer, self).fit_transform(word_data, y)
+        new_features = []
+        for idx, item in enumerate(x):
+            item.pop(self.word_data_key, None)
+            new_item = item
+            new_item["word_features"]=word_features[idx]
+            new_features.append(new_item)
+        return new_features
+    
+def build_poi_id_model(data_dict):
+    ### Task 1: Select what features you'll use.
+    ### features_list is a list of strings, each of which is a feature name.
+    ### The first feature must be "poi".
+    pipeline = Pipeline([
+        ("StripKeys", StripKeys()),
+        ("GetEmailText", GetEmailText()),
+        ("VectorizeMail", TfidfVectorizerForFeature(word_data_key = "email_text", sublinear_tf=True, max_df=0.5,
+                                stop_words='english'))])
+    
+    print pipeline.fit_transform(data_dict)
+    return
 
-# Provided to give you a starting point. Try a variety of classifiers.
-from sklearn.naive_bayes import GaussianNB
-clf = GaussianNB()
+def blub():
+    features_list = [target] + features_financial + features_emails
 
-### Task 5: Tune your classifier to achieve better than .3 precision and recall 
-### using our testing script. Check the tester.py script in the final project
-### folder for details on the evaluation method, especially the test_classifier
-### function. Because of the small size of the dataset, the script uses
-### stratified shuffle split cross validation. For more info: 
-### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
+    # was features_list = ['poi','salary'] # You will need to use more features
 
-# Example starting point. Try investigating other evaluation techniques!
-from sklearn.cross_validation import train_test_split
-features_train, features_test, labels_train, labels_test = \
-    train_test_split(features, labels, test_size=0.3, random_state=42)
+    ### Task 2: Remove outliers
+    # for key, value in data_dict.items():
+    #     if value["salary"] <> "NaN" and value["salary"] > 1000000 and \
+    #         value["bonus"] <> "NaN" and value["bonus"] > 5000000:
+    #         del data_dict[key]
 
-clf.fit(features_train, labels_train)
+    ### Task 3: Create new feature(s)
+    words_file_handler = open("word_data.pkl", "r")
+    word_data = pickle.load(words_file_handler)
+    words_file_handler.close()
 
-print clf.score(features_test, labels_test)
-### Task 6: Dump your classifier, dataset, and features_list so anyone can
-### check your results. You do not need to change anything below, but make sure
-### that the version of poi_id.py that you submit can be run on its own and
-### generates the necessary .pkl files for validating your results.
+    email_authors_handler = open("email_authors.pkl", "r")
+    email_authors = pickle.load(email_authors_handler)
+    email_authors_handler.close()
+    ### Store to my_dataset for easy export below.
+    my_dataset = data_dict
 
-dump_classifier_and_data(clf, my_dataset, features_list)
+    ### Extract features and labels from dataset for local testing
+    data = featureFormat(my_dataset, features_list, sort_keys=False, remove_all_zeroes=False)
+    labels, features = targetFeatureSplit(data)
+
+    features_train, features_test, labels_train, labels_test = \
+        cross_validation.train_test_split(features, labels, test_size=0.1, random_state=42)
+    word_data_train, word_data_test, _, _ = \
+        cross_validation.train_test_split(word_data, labels, test_size=0.1, random_state=42)
+
+    ### text vectorization--go from strings to lists of numbers
+    vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=0.5,
+                                 stop_words='english')
+    word_data_train_transformed = vectorizer.fit_transform(word_data_train)
+    word_data_test_transformed = vectorizer.transform(word_data_test)
+
+    ### feature selection, because text is super high dimensional and 
+    ### can be really computationally chewy as a result
+    selector = SelectPercentile(f_classif, percentile=1)
+    selector.fit(word_data_train_transformed, labels_train)
+    word_data_train_transformed = selector.transform(word_data_train_transformed).toarray()
+    word_data_test_transformed  = selector.transform(word_data_test_transformed).toarray()
+
+
+
+    ### Task 4: Try a varity of classifiers
+    ### Please name your classifier clf for easy export below.
+    ### Note that if you want to do PCA or other multi-stage operations,
+    ### you'll need to use Pipelines. For more info:
+    ### http://scikit-learn.org/stable/modules/pipeline.html
+
+    # Provided to give you a starting point. Try a variety of classifiers.
+    from sklearn.naive_bayes import GaussianNB
+    clf = GaussianNB()
+
+    ### Task 5: Tune your classifier to achieve better than .3 precision and recall 
+    ### using our testing script. Check the tester.py script in the final project
+    ### folder for details on the evaluation method, especially the test_classifier
+    ### function. Because of the small size of the dataset, the script uses
+    ### stratified shuffle split cross validation. For more info: 
+    ### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
+
+    # Example starting point. Try investigating other evaluation techniques!
+
+    clf.fit(np.hstack((features_train, word_data_train_transformed)), labels_train)
+
+    print clf.score(np.hstack((features_test, word_data_test_transformed)), labels_test)
+
+    clf.fit(word_data_train_transformed, labels_train)
+
+    print clf.score(word_data_test_transformed, labels_test)
+    ### Task 6: Dump your classifier, dataset, and features_list so anyone can
+    ### check your results. You do not need to change anything below, but make sure
+    ### that the version of poi_id.py that you submit can be run on its own and
+    ### generates the necessary .pkl files for validating your results.
+
+    dump_classifier_and_data(clf, my_dataset, features_list)
+
+if __name__ =="__main__":
+    ### Load the dictionary containing the dataset
+
+    with open("final_project_dataset.pkl", "r") as data_file:
+        data_dict = pickle.load(data_file)
+        build_poi_id_model(dict(data_dict.items()[0:5]))
