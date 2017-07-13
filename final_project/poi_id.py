@@ -6,11 +6,16 @@ import pickle
 from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
 from sklearn import cross_validation
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectPercentile, f_classif
+
+from sklearn.naive_bayes import GaussianNB
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
+from sklearn.pipeline import FeatureUnion
 from scipy.sparse import vstack as sparse_vstack
 from parse_out_email_text import parseOutText
 
@@ -87,8 +92,8 @@ class DropSelectedFeatures(BaseEstimator, TransformerMixin):
         reduced_features = []
         for item in x:
             new_item = {}
-            for key, value in item:
-                if key not in drop_feature_keys:
+            for key, value in item.items():
+                if key not in self.drop_feature_keys:
                     new_item[key] = value
             reduced_features.append(new_item)
         return reduced_features
@@ -150,7 +155,23 @@ class SelectPercentileForFeature(SelectPercentile):
             new_features.append(new_item)
         return new_features
 
+class DenseTransformer(TransformerMixin):
+    """ https://stackoverflow.com/questions/28384680/scikit-learns-pipeline-a-sparse-matrix-was-passed-but-dense-data-is-required """
+    def transform(self, X, y=None, **fit_params):
+        return X.todense()
+
+    def fit_transform(self, X, y=None, **fit_params):
+        self.fit(X, y, **fit_params)
+        return self.transform(X)
+
+    def fit(self, X, y=None, **fit_params):
+        return self
+
 def build_poi_id_model(features, labels):
+
+    features_train, features_test, labels_train, labels_test = \
+        cross_validation.train_test_split(features, labels, test_size=0.1, random_state=42)
+
     ### Task 1: Select what features you'll use.
     ### features_list is a list of strings, each of which is a feature name.
     ### The first feature must be "poi".
@@ -158,14 +179,31 @@ def build_poi_id_model(features, labels):
         ("GetEmailText", GetEmailText()),
         ("VectorizeMail", TfidfVectorizer(sublinear_tf=True, max_df=0.5,
                                 stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
-        ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=1))])
+        ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=1)),
+        ("ToDense", DenseTransformer())])
     
-    # TODO: add sklearn.feature_extraction.DictVectorizer to pipeline
-
     # Test email pipeline returning 
-    print pipeline_email_text.fit_transform(features, labels)
-    selected_indices = pipeline_email_text.named_steps["SelectPercentile"].get_support(indices=True)
-    print np.take(pipeline_email_text.named_steps["VectorizeMail"].get_feature_names(),selected_indices)
+    #print pipeline_email_text.fit_transform(features, labels)
+    #selected_indices = pipeline_email_text.named_steps["SelectPercentile"].get_support(indices=True)
+    #print np.take(pipeline_email_text.named_steps["VectorizeMail"].get_feature_names(),selected_indices)
+
+    # TODO: add sklearn.feature_extraction.DictVectorizer to pipeline
+    pipeline_other = Pipeline([
+        ("DropEmailAddress", DropSelectedFeatures(drop_feature_keys="email_address")),
+        ("ConvertToVector", DictVectorizer(sparse=False))
+    ])
+
+    pipeline_union = Pipeline([
+        ("union", FeatureUnion(
+            transformer_list=[
+                ("email_text", pipeline_email_text),
+                ("rest", pipeline_other)
+            ]
+        )),
+        ("GaussianNB", GaussianNB())
+    ])
+    pipeline_union.fit(features, labels)
+
     return
 
 def blub():
@@ -258,7 +296,7 @@ if __name__ =="__main__":
         features = []
         labels = []
         names = []
-        for key, value in test_sample.items():
+        for key, value in data_dict.items():
             labels.append(value["poi"])
             value.pop("poi",None)
             features.append(value)
