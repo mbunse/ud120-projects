@@ -2,6 +2,8 @@
 
 from nltk.stem.snowball import SnowballStemmer
 import string
+import re
+
 
 def parseOutText(f):
     """ given an opened email file f, parse out all text below the
@@ -20,11 +22,28 @@ def parseOutText(f):
     f.seek(0)  ### go back to beginning of file (annoying)
     all_text = f.read()
     ### split off metadata
-    content = all_text.split("X-FileName:")
+    
+    content = re.split("X-FileName:.*$", all_text, flags=re.MULTILINE, maxsplit=1)
     words = ""
     if len(content) > 1:
+        text_string = content[1]
+
+        ## remove mails that are forwarded or to which are responded
+        # e.g. ---------------------- Forwarded"
+        text_string = re.split("-*\sForwarded", text_string, maxsplit=1)[0]
+
+        # -----Original Message-----
+        text_string = re.split("-*\Original\sMessage", text_string, maxsplit=1)[0]
+
+        # Vince J Kaminski@ECT
+        # 04/30/2001 02:28 PM
+        # To:	Stanley Horton/Corp/Enron@Enron, Danny McCarty/ET&S/Enron@Enron
+        # cc:	Vince J Kaminski/HOU/ECT@ECT 
+        text_string = re.split("((.*\n){2})To:\s", text_string, maxsplit=1)[0]
+
         ### remove punctuation
-        text_string = content[1].translate(string.maketrans("", ""), string.punctuation)
+        # should be autopmatically by scikit learn
+        #text_string = text_string.translate(string.maketrans("", ""), string.punctuation)
 
         ### project part 2: comment out the line below
         #words = text_string

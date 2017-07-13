@@ -11,7 +11,7 @@ from sklearn.feature_selection import SelectPercentile, f_classif
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
-
+from scipy.sparse import vstack as sparse_vstack
 from parse_out_email_text import parseOutText
 
 FEATURES_FINANCIAL = ['salary',
@@ -71,12 +71,28 @@ class GetEmailText(BaseEstimator, TransformerMixin):
                         email_text = " ".join([email_text, parseOutText(email)])
                         email.close()
                     ### append the text to word_data
-                item["email_text"] = email_text
+                new_features.append(email_text)
             except IOError:
-                item["email_text"] = ""
-            new_features.append(item)
+                new_features.append("")
         return new_features
 
+class DropSelectedFeatures(BaseEstimator, TransformerMixin):
+    def __init__(self, drop_feature_keys):
+        self.drop_feature_keys = drop_feature_keys
+
+    def fit(self, x, y=None):
+        return self
+
+    def transform(self, x):
+        reduced_features = []
+        for item in x:
+            new_item = {}
+            for key, value in item:
+                if key not in drop_feature_keys:
+                    new_item[key] = value
+            reduced_features.append(new_item)
+        return reduced_features
+    
 class TfidfVectorizerForFeature(TfidfVectorizer):
     
     def __init__(self, word_data_key="email_text", **kwargs):
@@ -110,17 +126,46 @@ class TfidfVectorizerForFeature(TfidfVectorizer):
             new_features.append(new_item)
         return new_features
     
-def build_poi_id_model(data_dict):
+# TODO: Put select percentile and tfidvecor in one step?
+# use SelectPercentile.get_support(indices=False) to get the indices
+# from  TfidfVectorizer.get_feature_names()
+class SelectPercentileForFeature(SelectPercentile):
+    def __init__(self, word_features_key="word_features", **kwargs):
+        self.word_features_key = word_features_key
+        SelectPercentile.__init__(self, **kwargs)
+    def fit(self, x, y=None):
+        word_features = [item[self.word_features_key] for item in x]
+        word_features = sparse_vstack(word_features)
+        super(SelectPercentile, self).fit(word_features, y)
+        return self 
+    def transform(self, x):
+        word_features = [item[self.word_features_key] for item in x]
+        word_features = sparse_vstack(word_features)
+        word_features_transformed = super(SelectPercentile, self).transform(word_features)
+        new_features = []
+        for idx, item in enumerate(x):
+            item.pop(self.word_features_key, None)
+            new_item = item
+            new_item["word_features_transformed"]=word_features_transformed[idx].toarray()
+            new_features.append(new_item)
+        return new_features
+
+def build_poi_id_model(features, labels):
     ### Task 1: Select what features you'll use.
     ### features_list is a list of strings, each of which is a feature name.
     ### The first feature must be "poi".
-    pipeline = Pipeline([
-        ("StripKeys", StripKeys()),
+    pipeline_email_text = Pipeline([
         ("GetEmailText", GetEmailText()),
-        ("VectorizeMail", TfidfVectorizerForFeature(word_data_key = "email_text", sublinear_tf=True, max_df=0.5,
-                                stop_words='english'))])
+        ("VectorizeMail", TfidfVectorizer(sublinear_tf=True, max_df=0.5,
+                                stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
+        ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=1))])
     
-    print pipeline.fit_transform(data_dict)
+    # TODO: add sklearn.feature_extraction.DictVectorizer to pipeline
+
+    # Test email pipeline returning 
+    print pipeline_email_text.fit_transform(features, labels)
+    selected_indices = pipeline_email_text.named_steps["SelectPercentile"].get_support(indices=True)
+    print np.take(pipeline_email_text.named_steps["VectorizeMail"].get_feature_names(),selected_indices)
     return
 
 def blub():
@@ -207,4 +252,15 @@ if __name__ =="__main__":
 
     with open("final_project_dataset.pkl", "r") as data_file:
         data_dict = pickle.load(data_file)
-        build_poi_id_model(dict(data_dict.items()[0:5]))
+        test_sample = dict(data_dict.items()[0:20])
+
+        # Split label
+        features = []
+        labels = []
+        names = []
+        for key, value in test_sample.items():
+            labels.append(value["poi"])
+            value.pop("poi",None)
+            features.append(value)
+            names.append(key)
+        build_poi_id_model(features, labels)
