@@ -39,7 +39,13 @@ def parseOutText(f):
         # 04/30/2001 02:28 PM
         # To:	Stanley Horton/Corp/Enron@Enron, Danny McCarty/ET&S/Enron@Enron
         # cc:	Vince J Kaminski/HOU/ECT@ECT 
-        text_string = re.split("((.*\n){2})To:\s", text_string, maxsplit=1)[0]
+        # or
+        # Vince J Kaminski@ECT
+        # 04/30/2001 02:28 PM
+        # to:	Stanley Horton/Corp/Enron@Enron, Danny McCarty/ET&S/Enron@Enron
+        # cc:	Vince J Kaminski/HOU/ECT@ECT 
+        
+        text_string = re.split("((.*\n){2})[Tt]o:\s", text_string, maxsplit=1)[0]
 
         ### remove punctuation
         # should be autopmatically by scikit learn

@@ -9,6 +9,7 @@ from sklearn import cross_validation
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectPercentile, f_classif
+from sklearn.externals import joblib
 
 from sklearn.naive_bayes import GaussianNB
 
@@ -52,13 +53,16 @@ class StripKeys(BaseEstimator, TransformerMixin):
 
 class GetEmailText(BaseEstimator, TransformerMixin):
     """ extract email texts for person """
-    def __init__(self):
-        pass
+    def __init__(self, skip=False):
+        self.skip = skip
     def fit(self, x, y=None):
         return self
 
     def transform(self, features):
         """ concatenate all emails texts """
+        if self.skip:
+            return features
+
         new_features = [] 
         for item in features:
             email_address = item["email_address"]
@@ -130,7 +134,28 @@ class TfidfVectorizerForFeature(TfidfVectorizer):
             new_item["word_features"]=word_features[idx]
             new_features.append(new_item)
         return new_features
+
+
+class TfidfVectorizerDebug(TfidfVectorizer):
     
+    def __init__(self, **kwargs):
+        TfidfVectorizer.__init__(self, **kwargs)
+    
+    def transform(self, x):
+        print "TfidfVectorizerDebug.transform"
+        print len(x)
+        return super(TfidfVectorizer, self).transform(x)
+
+    def fit(self, x, y=None):
+        print "TfidfVectorizerDebug.fit"
+        print len(x)
+        fit_transform(self, x, y=None)
+        return self 
+    def fit_transform(self, x, y=None):
+        print "TfidfVectorizerDebug.fit_transform"
+        print len(x)
+        return super(TfidfVectorizer, self).fit_transform(x, y)
+
 # TODO: Put select percentile and tfidvecor in one step?
 # use SelectPercentile.get_support(indices=False) to get the indices
 # from  TfidfVectorizer.get_feature_names()
@@ -155,7 +180,7 @@ class SelectPercentileForFeature(SelectPercentile):
             new_features.append(new_item)
         return new_features
 
-class DenseTransformer(TransformerMixin):
+class DenseTransformer(BaseEstimator, TransformerMixin):
     """ https://stackoverflow.com/questions/28384680/scikit-learns-pipeline-a-sparse-matrix-was-passed-but-dense-data-is-required """
     def transform(self, X, y=None, **fit_params):
         return X.todense()
@@ -167,32 +192,90 @@ class DenseTransformer(TransformerMixin):
     def fit(self, X, y=None, **fit_params):
         return self
 
+class PersistAndLoadVector(BaseEstimator, TransformerMixin):
+    """ Transformer class to dump and/or load a vector in fitting """
+    def __init__(self, filename=None, persist=False, load=False, ):
+        self.persist = persist
+        self.load = load
+        if (load or persist) and filename == None:
+            raise ValueError("No filename given but persist or load set to true.")
+        else:
+            self.filename = filename 
+
+    def fit(self, x, y=None):
+        if self.persist:
+            print "Dumping vector"
+            joblib.dump(x, self.filename)
+        return self
+
+    def fit_transform(self, x, y=None):
+        if self.persist:
+            print "Dumping vector"
+            joblib.dump(x, self.filename)          
+        if self.load:
+            print "fit_transform: Loading vector"
+            vec = joblib.load(self.filename)
+            print len(vec)
+            return vec
+
+    def transform(self, x):
+        if self.persist:
+            print "Dumping vector"
+            joblib.dump(x, self.filename)          
+        if self.load:
+            print "transform: Loading vector"
+            vec = joblib.load(self.filename)
+            print len(vec)
+            return vec
+        else:
+            return x
+    
+
+
 def build_poi_id_model(features, labels):
 
+    # Split into training and testing
     features_train, features_test, labels_train, labels_test = \
         cross_validation.train_test_split(features, labels, test_size=0.1, random_state=42)
 
-    ### Task 1: Select what features you'll use.
-    ### features_list is a list of strings, each of which is a feature name.
-    ### The first feature must be "poi".
+    # Setting for persistance
+    # In the persistance run, texts from emails are extracted for 
+    # training and testing data sets and the results are persisted
+    # to files.
+    # If not in persistance run, these files are only loaded and
+    # processing of the emails is skipped
+
+    persist_run = True
+    persist = False
+    load = True
+    if persist_run:
+        persist = True
+
+    # Pipeline to process email texts
+    # First, extract texts from person
+    # then, eventually persist those texts
+    # then, vectorize the texts
+    # then, select only the percentile with the most separating power
+    # then, convert result to dense array (needed for some classifiers)
     pipeline_email_text = Pipeline([
-        ("GetEmailText", GetEmailText()),
+        ("GetEmailText", GetEmailText(skip=not persist)),
+        ("PersistAndLoad", PersistAndLoadVector(filename="email_text.pkl", persist=persist, load=load)),
         ("VectorizeMail", TfidfVectorizer(sublinear_tf=True, max_df=0.5,
                                 stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
         ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=1)),
         ("ToDense", DenseTransformer())])
     
-    # Test email pipeline returning 
-    #print pipeline_email_text.fit_transform(features, labels)
-    #selected_indices = pipeline_email_text.named_steps["SelectPercentile"].get_support(indices=True)
-    #print np.take(pipeline_email_text.named_steps["VectorizeMail"].get_feature_names(),selected_indices)
-
-    # TODO: add sklearn.feature_extraction.DictVectorizer to pipeline
+    # Process other features
+    # First, drop email_adress feature, which is only needed to
+    # load the email texts
+    # then, convert dictionary to dense vector
     pipeline_other = Pipeline([
         ("DropEmailAddress", DropSelectedFeatures(drop_feature_keys="email_address")),
         ("ConvertToVector", DictVectorizer(sparse=False))
     ])
 
+    # Combine email text features and other features
+    # then run classifier on these features
     pipeline_union = Pipeline([
         ("union", FeatureUnion(
             transformer_list=[
@@ -202,11 +285,35 @@ def build_poi_id_model(features, labels):
         )),
         ("GaussianNB", GaussianNB())
     ])
-    pipeline_union.fit(features, labels)
+
+    # Fit the complete pipeline
+    pipeline_union.fit(features_train, labels_train)
+
+    # Adjust settings according to persist variable
+    # If persist_run==True then email texts
+    # from test dataset is also persisted
+    # otherwise also these data is loaded
+    pipeline_union.named_steps["union"].transformer_list[0][1].set_params(GetEmailText__skip=not persist,
+        PersistAndLoad__load=load,
+        PersistAndLoad__persist=persist,
+        PersistAndLoad__filename="email_text_test.pkl")
+
+    # Check setting of load parameter
+    print "load?", pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["PersistAndLoad"].load
+
+    # Test accuracy of model
+    print pipeline_union.score(features_test, labels_test)
+
+    # Dump word features selected by email text pipeline
+    selected_indices = ipeline_union.named_steps["union"].transformer_list[0][1].named_steps["SelectPercentile"].get_support(indices=True)
+    print np.take(ipeline_union.named_steps["union"].transformer_list[0][1].named_steps["VectorizeMail"].get_feature_names(),selected_indices)
 
     return
 
 def blub():
+    ### Task 1: Select what features you'll use.
+    ### features_list is a list of strings, each of which is a feature name.
+    ### The first feature must be "poi".
     features_list = [target] + features_financial + features_emails
 
     # was features_list = ['poi','salary'] # You will need to use more features
