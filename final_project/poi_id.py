@@ -245,7 +245,7 @@ def build_poi_id_model(features, labels):
     # If not in persistance run, these files are only loaded and
     # processing of the emails is skipped
 
-    persist_run = True
+    persist_run = False
     persist = False
     load = True
     if persist_run:
@@ -305,8 +305,8 @@ def build_poi_id_model(features, labels):
     print pipeline_union.score(features_test, labels_test)
 
     # Dump word features selected by email text pipeline
-    selected_indices = ipeline_union.named_steps["union"].transformer_list[0][1].named_steps["SelectPercentile"].get_support(indices=True)
-    print np.take(ipeline_union.named_steps["union"].transformer_list[0][1].named_steps["VectorizeMail"].get_feature_names(),selected_indices)
+    selected_indices = pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["SelectPercentile"].get_support(indices=True)
+    print np.take(pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["VectorizeMail"].get_feature_names(),selected_indices)
 
     return
 
