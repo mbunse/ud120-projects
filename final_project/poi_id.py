@@ -82,6 +82,7 @@ class GetEmailText(BaseEstimator, TransformerMixin):
                     ### append the text to word_data
                 new_features.append(email_text)
             except IOError:
+                print "File not found"
                 new_features.append("")
         return new_features
 
@@ -217,6 +218,8 @@ class PersistAndLoadVector(BaseEstimator, TransformerMixin):
             vec = joblib.load(self.filename)
             print len(vec)
             return vec
+        else:
+            return x
 
     def transform(self, x):
         if self.persist:
@@ -245,7 +248,7 @@ def build_poi_id_model(features, labels):
     # If not in persistance run, these files are only loaded and
     # processing of the emails is skipped
 
-    persist_run = False
+    persist_run = True
     persist = False
     load = True
     if persist_run:
@@ -260,7 +263,7 @@ def build_poi_id_model(features, labels):
     pipeline_email_text = Pipeline([
         ("GetEmailText", GetEmailText(skip=not persist)),
         ("PersistAndLoad", PersistAndLoadVector(filename="email_text.pkl", persist=persist, load=load)),
-        ("VectorizeMail", TfidfVectorizer(sublinear_tf=True, max_df=0.5,
+        ("VectorizeMail", TfidfVectorizerDebug(sublinear_tf=True, max_df=0.5,
                                 stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
         ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=1)),
         ("ToDense", DenseTransformer())])
@@ -397,13 +400,21 @@ if __name__ =="__main__":
 
     with open("final_project_dataset.pkl", "r") as data_file:
         data_dict = pickle.load(data_file)
-        test_sample = dict(data_dict.items()[0:20])
+
+        # drop TOTAL dataset:
+        data_dict.pop("TOTAL",None)
+
+        # Set to False to run on full sample
+        if False:
+            sample_to_use = dict(data_dict.items()[0:20])
+        else:
+            sample_to_use = data_dict
 
         # Split label
         features = []
         labels = []
         names = []
-        for key, value in data_dict.items():
+        for key, value in sample_to_use.items():
             labels.append(value["poi"])
             value.pop("poi",None)
             features.append(value)
