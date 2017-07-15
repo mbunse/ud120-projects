@@ -3,15 +3,17 @@
 import sys
 import os
 import pickle
-from feature_format import featureFormat, targetFeatureSplit
+#from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
-from sklearn import cross_validation
+from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectPercentile, f_classif
 from sklearn.externals import joblib
 
-from sklearn.naive_bayes import GaussianNB
+from sklearn.preprocessing import StandardScaler
+from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -99,7 +101,9 @@ class DropSelectedFeatures(BaseEstimator, TransformerMixin):
             new_item = {}
             for key, value in item.items():
                 if key not in self.drop_feature_keys:
-                    new_item[key] = value
+                    if value=="NaN":
+                        value = 0
+                    new_item[key] = float(value)
             reduced_features.append(new_item)
         return reduced_features
     
@@ -234,12 +238,28 @@ class PersistAndLoadVector(BaseEstimator, TransformerMixin):
             return x
     
 
+class MultinomialNBTransformer(MultinomialNB):
+    def __init__(self, **kwargs):
+        MultinomialNB.__init__(self, **kwargs)
+    
+    def transform(self, x):
+        pred = self.predict(x)
+        new_features = []
+        for item in pred:
+            new_features.append([item])
+        return new_features
+
+    def fit_transform(self, x, y):
+        self.fit(x,y)
+        pred = self.transform(x)
+        return pred
+
 
 def build_poi_id_model(features, labels):
 
     # Split into training and testing
     features_train, features_test, labels_train, labels_test = \
-        cross_validation.train_test_split(features, labels, test_size=0.1, random_state=42)
+        train_test_split(features, labels, test_size=0.1, random_state=42)
 
     # Setting for persistance
     # In the persistance run, texts from emails are extracted for 
@@ -248,7 +268,7 @@ def build_poi_id_model(features, labels):
     # If not in persistance run, these files are only loaded and
     # processing of the emails is skipped
 
-    persist_run = True
+    persist_run = False
     persist = False
     load = True
     if persist_run:
@@ -263,10 +283,11 @@ def build_poi_id_model(features, labels):
     pipeline_email_text = Pipeline([
         ("GetEmailText", GetEmailText(skip=not persist)),
         ("PersistAndLoad", PersistAndLoadVector(filename="email_text.pkl", persist=persist, load=load)),
-        ("VectorizeMail", TfidfVectorizerDebug(sublinear_tf=True, max_df=0.5,
+        ("VectorizeMail", TfidfVectorizerDebug(sublinear_tf=True, max_df=0.02,
                                 stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
-        ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=1)),
-        ("ToDense", DenseTransformer())])
+        ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=5)),
+        ("NaiveBayes", MultinomialNBTransformer()),
+    ])
     
     # Process other features
     # First, drop email_adress feature, which is only needed to
@@ -274,7 +295,9 @@ def build_poi_id_model(features, labels):
     # then, convert dictionary to dense vector
     pipeline_other = Pipeline([
         ("DropEmailAddress", DropSelectedFeatures(drop_feature_keys="email_address")),
-        ("ConvertToVector", DictVectorizer(sparse=False))
+        ("ConvertToVector", DictVectorizer(sparse=False)),
+        ("Persist", PersistAndLoadVector(filename="vector.pkl", persist=True, load=False)),
+        ("Scale", StandardScaler())        
     ])
 
     # Combine email text features and other features
@@ -286,7 +309,7 @@ def build_poi_id_model(features, labels):
                 ("rest", pipeline_other)
             ]
         )),
-        ("GaussianNB", GaussianNB())
+        ("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=7))
     ])
 
     # Fit the complete pipeline
@@ -301,6 +324,8 @@ def build_poi_id_model(features, labels):
         PersistAndLoad__persist=persist,
         PersistAndLoad__filename="email_text_test.pkl")
 
+    pipeline_union.named_steps["union"].transformer_list[1][1].set_params(Persist__persist=False)
+
     # Check setting of load parameter
     print "load?", pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["PersistAndLoad"].load
 
@@ -311,89 +336,87 @@ def build_poi_id_model(features, labels):
     selected_indices = pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["SelectPercentile"].get_support(indices=True)
     print np.take(pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["VectorizeMail"].get_feature_names(),selected_indices)
 
+
+    # Try classification only based on email texts
+    pipeline_email_text_clf = Pipeline([
+        ("PersistAndLoad", PersistAndLoadVector(filename="email_text.pkl", persist=False, load=load)),
+        ("VectorizeMail", TfidfVectorizerDebug(sublinear_tf=True, max_df=0.02,
+                                stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
+        ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=5)),
+        ("NaiveBayes", MultinomialNB())
+    ])
+
+    pipeline_email_text_clf.fit(features_train, labels_train)
+
+    # Adjust settings according to persist variable
+    pipeline_email_text_clf.set_params(PersistAndLoad__filename="email_text_test.pkl")
+
+    # Score is 0.8 for MultinomialNB, max_df=0.5, percentile=1
+    print "Score for only email text clf: ", pipeline_email_text_clf.score(features_test, labels_test)
+
     return
 
-def blub():
-    ### Task 1: Select what features you'll use.
-    ### features_list is a list of strings, each of which is a feature name.
-    ### The first feature must be "poi".
-    features_list = [target] + features_financial + features_emails
+def prepare_data(data_dict, filename="data_dict.pkl", load=False):
+    """ 
+    If load is false, function takes basic input data, adds features,
+    persists the final data and returns the data.
+    
+    Parameters
+    ----------
+    data_dict: a dictionary with key of sample id
+               and value of dictionarys with key of 
+               feature name and value of feature value
+    filename:  filename for persiting or loading
+    load:      if true, final data is just loaded.
+               if false, data is transformed and persisted 
+    """
 
-    # was features_list = ['poi','salary'] # You will need to use more features
+    if load:
+        return joblib.load(filename)
+    
+    emailtext_extractor = GetEmailText(skip=False)
+    data_dict["email_text"] = emailtext_extractor.transform(data_dict.values())
+    data_dict.pop("email_address", None)
+    joblib.dump(data_dict, filename)
+    return data_dict
 
-    ### Task 2: Remove outliers
-    # for key, value in data_dict.items():
-    #     if value["salary"] <> "NaN" and value["salary"] > 1000000 and \
-    #         value["bonus"] <> "NaN" and value["bonus"] > 5000000:
-    #         del data_dict[key]
+### Task 1: Select what features you'll use.
+### features_list is a list of strings, each of which is a feature name.
+### The first feature must be "poi".
+# was features_list = ['poi','salary'] # You will need to use more features
 
-    ### Task 3: Create new feature(s)
-    words_file_handler = open("word_data.pkl", "r")
-    word_data = pickle.load(words_file_handler)
-    words_file_handler.close()
+### Task 2: Remove outliers
 
-    email_authors_handler = open("email_authors.pkl", "r")
-    email_authors = pickle.load(email_authors_handler)
-    email_authors_handler.close()
-    ### Store to my_dataset for easy export below.
-    my_dataset = data_dict
+### Task 3: Create new feature(s)
 
-    ### Extract features and labels from dataset for local testing
-    data = featureFormat(my_dataset, features_list, sort_keys=False, remove_all_zeroes=False)
-    labels, features = targetFeatureSplit(data)
+### Store to my_dataset for easy export below.
+#my_dataset = data_dict
 
-    features_train, features_test, labels_train, labels_test = \
-        cross_validation.train_test_split(features, labels, test_size=0.1, random_state=42)
-    word_data_train, word_data_test, _, _ = \
-        cross_validation.train_test_split(word_data, labels, test_size=0.1, random_state=42)
+### Extract features and labels from dataset for local testing
+#data = featureFormat(my_dataset, features_list, sort_keys=False, remove_all_zeroes=False)
+#labels, features = targetFeatureSplit(data)
 
-    ### text vectorization--go from strings to lists of numbers
-    vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=0.5,
-                                 stop_words='english')
-    word_data_train_transformed = vectorizer.fit_transform(word_data_train)
-    word_data_test_transformed = vectorizer.transform(word_data_test)
+### Task 4: Try a varity of classifiers
+### Please name your classifier clf for easy export below.
+### Note that if you want to do PCA or other multi-stage operations,
+### you'll need to use Pipelines. For more info:
+### http://scikit-learn.org/stable/modules/pipeline.html
 
-    ### feature selection, because text is super high dimensional and 
-    ### can be really computationally chewy as a result
-    selector = SelectPercentile(f_classif, percentile=1)
-    selector.fit(word_data_train_transformed, labels_train)
-    word_data_train_transformed = selector.transform(word_data_train_transformed).toarray()
-    word_data_test_transformed  = selector.transform(word_data_test_transformed).toarray()
+### Task 5: Tune your classifier to achieve better than .3 precision and recall 
+### using our testing script. Check the tester.py script in the final project
+### folder for details on the evaluation method, especially the test_classifier
+### function. Because of the small size of the dataset, the script uses
+### stratified shuffle split cross validation. For more info: 
+### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
 
+# Example starting point. Try investigating other evaluation techniques!
 
+### Task 6: Dump your classifier, dataset, and features_list so anyone can
+### check your results. You do not need to change anything below, but make sure
+### that the version of poi_id.py that you submit can be run on its own and
+### generates the necessary .pkl files for validating your results.
 
-    ### Task 4: Try a varity of classifiers
-    ### Please name your classifier clf for easy export below.
-    ### Note that if you want to do PCA or other multi-stage operations,
-    ### you'll need to use Pipelines. For more info:
-    ### http://scikit-learn.org/stable/modules/pipeline.html
-
-    # Provided to give you a starting point. Try a variety of classifiers.
-    from sklearn.naive_bayes import GaussianNB
-    clf = GaussianNB()
-
-    ### Task 5: Tune your classifier to achieve better than .3 precision and recall 
-    ### using our testing script. Check the tester.py script in the final project
-    ### folder for details on the evaluation method, especially the test_classifier
-    ### function. Because of the small size of the dataset, the script uses
-    ### stratified shuffle split cross validation. For more info: 
-    ### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
-
-    # Example starting point. Try investigating other evaluation techniques!
-
-    clf.fit(np.hstack((features_train, word_data_train_transformed)), labels_train)
-
-    print clf.score(np.hstack((features_test, word_data_test_transformed)), labels_test)
-
-    clf.fit(word_data_train_transformed, labels_train)
-
-    print clf.score(word_data_test_transformed, labels_test)
-    ### Task 6: Dump your classifier, dataset, and features_list so anyone can
-    ### check your results. You do not need to change anything below, but make sure
-    ### that the version of poi_id.py that you submit can be run on its own and
-    ### generates the necessary .pkl files for validating your results.
-
-    dump_classifier_and_data(clf, my_dataset, features_list)
+#dump_classifier_and_data(clf, my_dataset, features_list)
 
 if __name__ =="__main__":
     ### Load the dictionary containing the dataset
@@ -410,6 +433,7 @@ if __name__ =="__main__":
         else:
             sample_to_use = data_dict
 
+        #my_dataset = prepare_data(sample_to_use)
         # Split label
         features = []
         labels = []
