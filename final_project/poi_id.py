@@ -3,9 +3,10 @@
 import sys
 import os
 import pickle
+from time import time
 #from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectPercentile, f_classif
@@ -89,7 +90,7 @@ class GetEmailText(BaseEstimator, TransformerMixin):
         return new_features
 
 class DropSelectedFeatures(BaseEstimator, TransformerMixin):
-    def __init__(self, drop_feature_keys):
+    def __init__(self, drop_feature_keys = []):
         self.drop_feature_keys = drop_feature_keys
 
     def fit(self, x, y=None):
@@ -105,6 +106,19 @@ class DropSelectedFeatures(BaseEstimator, TransformerMixin):
                         value = 0
                     new_item[key] = float(value)
             reduced_features.append(new_item)
+        return reduced_features
+
+class SelectFeatures(BaseEstimator, TransformerMixin):
+    def __init__(self, selected_feature):
+        self.selected_feature = selected_feature
+
+    def fit(self, x, y=None):
+        return self
+
+    def transform(self, x):
+        reduced_features = []
+        for item in x:
+            reduced_features.append(item[self.selected_feature])
         return reduced_features
     
 class TfidfVectorizerForFeature(TfidfVectorizer):
@@ -239,8 +253,8 @@ class PersistAndLoadVector(BaseEstimator, TransformerMixin):
     
 
 class MultinomialNBTransformer(MultinomialNB):
-    def __init__(self, **kwargs):
-        MultinomialNB.__init__(self, **kwargs)
+    def __init__(self, alpha=1.0, fit_prior=True, class_prior=None):
+        MultinomialNB.__init__(self, alpha, fit_prior, class_prior)
     
     def transform(self, x):
         pred = self.predict(x)
@@ -255,7 +269,23 @@ class MultinomialNBTransformer(MultinomialNB):
         return pred
 
 
-def build_poi_id_model(features, labels):
+def report(results, n_top=3):
+    """
+    Utility function to report best scores
+    http://scikit-learn.org/stable/auto_examples/model_selection/randomized_search.html
+
+    """
+    for i in range(1, n_top + 1):
+        candidates = np.flatnonzero(results['rank_test_score'] == i)
+        for candidate in candidates:
+            print("Model with rank: {0}".format(i))
+            print("Mean validation score: {0:.3f} (std: {1:.3f})".format(
+                  results['mean_test_score'][candidate],
+                  results['std_test_score'][candidate]))
+            print("Parameters: {0}".format(results['params'][candidate]))
+            print("")
+
+def build_poi_id_model(features, labels, persist_run = False):
 
     # Split into training and testing
     features_train, features_test, labels_train, labels_test = \
@@ -268,7 +298,7 @@ def build_poi_id_model(features, labels):
     # If not in persistance run, these files are only loaded and
     # processing of the emails is skipped
 
-    persist_run = False
+    
     persist = False
     load = True
     if persist_run:
@@ -281,12 +311,11 @@ def build_poi_id_model(features, labels):
     # then, select only the percentile with the most separating power
     # then, convert result to dense array (needed for some classifiers)
     pipeline_email_text = Pipeline([
-        ("GetEmailText", GetEmailText(skip=not persist)),
-        ("PersistAndLoad", PersistAndLoadVector(filename="email_text.pkl", persist=persist, load=load)),
-        ("VectorizeMail", TfidfVectorizerDebug(sublinear_tf=True, max_df=0.02,
+        ("GetEmailText", SelectFeatures(selected_feature="email_text")),
+        ("VectorizeMail", TfidfVectorizer(sublinear_tf=True, max_df=0.02,
                                 stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
         ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=5)),
-        ("NaiveBayes", MultinomialNBTransformer()),
+        ("NaiveBayes", MultinomialNBTransformer(alpha=1.)),
     ])
     
     # Process other features
@@ -294,10 +323,9 @@ def build_poi_id_model(features, labels):
     # load the email texts
     # then, convert dictionary to dense vector
     pipeline_other = Pipeline([
-        ("DropEmailAddress", DropSelectedFeatures(drop_feature_keys="email_address")),
+        ("DropEmailAddress", DropSelectedFeatures(drop_feature_keys=["email_address", "email_text"])),
         ("ConvertToVector", DictVectorizer(sparse=False)),
-        ("Persist", PersistAndLoadVector(filename="vector.pkl", persist=True, load=False)),
-        ("Scale", StandardScaler())        
+        ("Scale", StandardScaler())
     ])
 
     # Combine email text features and other features
@@ -313,46 +341,45 @@ def build_poi_id_model(features, labels):
     ])
 
     # Fit the complete pipeline
-    pipeline_union.fit(features_train, labels_train)
-
-    # Adjust settings according to persist variable
-    # If persist_run==True then email texts
-    # from test dataset is also persisted
-    # otherwise also these data is loaded
-    pipeline_union.named_steps["union"].transformer_list[0][1].set_params(GetEmailText__skip=not persist,
-        PersistAndLoad__load=load,
-        PersistAndLoad__persist=persist,
-        PersistAndLoad__filename="email_text_test.pkl")
-
-    pipeline_union.named_steps["union"].transformer_list[1][1].set_params(Persist__persist=False)
-
-    # Check setting of load parameter
-    print "load?", pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["PersistAndLoad"].load
-
     # Test accuracy of model
-    print pipeline_union.score(features_test, labels_test)
+    param_grid = {
+        "union__email_text__VectorizeMail__max_df": [0.02, 0.05, 0.1],
+        "union__email_text__VectorizeMail__ngram_range": [(1,1), (1, 2)],
+        "union__email_text__SelectPercentile__percentile": [1, 2, 5],
+        "union__email_text__NaiveBayes__alpha": [1, 0.8, 0.5],
+        "KNeighborsClassifier__n_neighbors": [3, 5, 10],
+        }
+
+    grid_search = GridSearchCV(pipeline_union, param_grid=param_grid)
+    start = time()
+    grid_search.fit(features, labels)
+
+    print("GridSearchCV took %.2f seconds for %d candidate parameter settings." 
+        % (time() - start, len(grid_search.cv_results_['params'])))
+    report(grid_search.cv_results_)
+
+    #scores = cross_val_score(pipeline_union, features, labels, cv=5)
+    #print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
     # Dump word features selected by email text pipeline
-    selected_indices = pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["SelectPercentile"].get_support(indices=True)
-    print np.take(pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["VectorizeMail"].get_feature_names(),selected_indices)
-
+    #selected_indices = pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["SelectPercentile"].get_support(indices=True)
+    #print np.take(pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["VectorizeMail"].get_feature_names(),selected_indices)
 
     # Try classification only based on email texts
     pipeline_email_text_clf = Pipeline([
-        ("PersistAndLoad", PersistAndLoadVector(filename="email_text.pkl", persist=False, load=load)),
+        ("GetEmailText", SelectFeatures(selected_feature="email_text")),
         ("VectorizeMail", TfidfVectorizerDebug(sublinear_tf=True, max_df=0.02,
-                                stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
+                                               stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
         ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=5)),
         ("NaiveBayes", MultinomialNB())
     ])
 
-    pipeline_email_text_clf.fit(features_train, labels_train)
 
-    # Adjust settings according to persist variable
-    pipeline_email_text_clf.set_params(PersistAndLoad__filename="email_text_test.pkl")
+    #scores = cross_val_score(pipeline_email_text_clf, features, labels, cv=5)
+    #print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
     # Score is 0.8 for MultinomialNB, max_df=0.5, percentile=1
-    print "Score for only email text clf: ", pipeline_email_text_clf.score(features_test, labels_test)
+    # print "Score for only email text clf: ", pipeline_email_text_clf.score(features_test, labels_test)
 
     return
 
@@ -375,8 +402,12 @@ def prepare_data(data_dict, filename="data_dict.pkl", load=False):
         return joblib.load(filename)
     
     emailtext_extractor = GetEmailText(skip=False)
-    data_dict["email_text"] = emailtext_extractor.transform(data_dict.values())
-    data_dict.pop("email_address", None)
+
+    email_texts = emailtext_extractor.transform(data_dict.values())
+    for idx, value in enumerate(data_dict.values()):
+        value["email_text"] = email_texts[idx]
+        value.pop("email_address", None)
+
     joblib.dump(data_dict, filename)
     return data_dict
 
@@ -433,14 +464,15 @@ if __name__ =="__main__":
         else:
             sample_to_use = data_dict
 
-        #my_dataset = prepare_data(sample_to_use)
+        my_dataset = prepare_data(sample_to_use, load=True)
+        #print my_dataset
         # Split label
         features = []
         labels = []
         names = []
-        for key, value in sample_to_use.items():
+        for key, value in my_dataset.items():
             labels.append(value["poi"])
             value.pop("poi",None)
             features.append(value)
             names.append(key)
-        build_poi_id_model(features, labels)
+        build_poi_id_model(features, labels, persist_run = False)
