@@ -3,6 +3,8 @@
 import sys
 import os
 import pickle
+import string
+
 from time import time
 #from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
@@ -15,7 +17,7 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.decomposition import TruncatedSVD
 from sklearn.ensemble import RandomForestClassifier
@@ -109,8 +111,10 @@ class GetEmailText(BaseEstimator, TransformerMixin):
             # 04/30/2001 02:28 PM
             # to:	Stanley Horton/Corp/Enron@Enron, Danny McCarty/ET&S/Enron@Enron
             # cc:	Vince J Kaminski/HOU/ECT@ECT 
-            
             text_string = re.split("((.*\n){2})[Tt]o:\s", text_string, maxsplit=1)[0]
+            
+            # remove punctuation
+            text_string = text_string.translate(None, string.punctuation)
 
             ### split the text string into individual words, stem each word,
             ### and append the stemmed word to words (make sure there's a single
@@ -177,10 +181,13 @@ class GetEmailText(BaseEstimator, TransformerMixin):
         return new_features
 
 class DropSelectedFeatures(BaseEstimator, TransformerMixin):
-    def __init__(self, drop_feature_keys = []):
-        self.drop_feature_keys = drop_feature_keys
+    def __init__(self, drop_match_keys = []):
+        self.drop_match_keys = drop_match_keys
 
     def fit(self, x, y=None):
+        self.drop_feature_keys = []
+        for match_key in self.drop_match_keys:
+            self.drop_feature_keys += filter(re.compile(match_key).match, x[0].keys())
         return self
 
     def transform(self, x):
@@ -195,6 +202,7 @@ class DropSelectedFeatures(BaseEstimator, TransformerMixin):
             reduced_features.append(new_item)
         return reduced_features
 
+
 class SelectFeatures(BaseEstimator, TransformerMixin):
     def __init__(self, selected_feature):
         self.selected_feature = selected_feature
@@ -207,7 +215,31 @@ class SelectFeatures(BaseEstimator, TransformerMixin):
         for item in x:
             reduced_features.append(item[self.selected_feature])
         return reduced_features
-    
+
+class SelectMatchFeatures(BaseEstimator, TransformerMixin):
+    def __init__(self, feature_match):
+        self.feature_match = feature_match
+        self.match_keys = None
+
+    def fit(self, x, y=None):
+        # calculate match keys from first element
+        self.match_keys = filter(re.compile(self.feature_match).match, x[0].keys())
+        return self
+
+    def transform(self, x):
+        reduced_features = []
+        for item in x:
+            sample_features = []
+            for key in self.match_keys:
+                sample_features.append(item[key])
+            
+            reduced_features.append(sample_features)
+
+        return np.asanyarray(reduced_features)
+
+    def get_feature_names(self):
+        return self.match_keys
+
 class TfidfVectorizerForFeature(TfidfVectorizer):
     
     def __init__(self, word_data_key="email_text", **kwargs):
@@ -378,7 +410,7 @@ def build_poi_id_model(features, labels):
     splitter = StratifiedKFold(n_splits=10)
 
     features_train, features_test, labels_train, labels_test = \
-        train_test_split(features, labels, test_size=0.1, 
+        train_test_split(features, labels, test_size=0.05, 
             random_state=123456,
             stratify=labels
             )
@@ -397,20 +429,24 @@ def build_poi_id_model(features, labels):
     # then, select only the percentile with the most separating power
     # then, convert result to dense array (needed for some classifiers)
     pipeline_email_text = Pipeline([
-        ("GetEmailText", SelectFeatures(selected_feature="email_text")),
-        ("VectorizeMail", TfidfVectorizer(max_df=0.1, min_df=1,
-                                stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
-        ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=80)),
+        ("GetEmailText", SelectMatchFeatures(feature_match="word_.*")),
+        #("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=10)),
+        ("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
         ("NaiveBayes", MultinomialNBTransformer(alpha=1,fit_prior=False)),
         ("Scale", StandardScaler()),
     ])
     
+    pipeline_subjects = Pipeline([
+        ("GetEmailText", SelectMatchFeatures(feature_match="sub_.*")),
+        ("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
+    ])
     # Process other features
     # First, drop email_adress feature, which is only needed to
     # load the email texts
     # then, convert dictionary to dense vector
     pipeline_other = Pipeline([
-        ("DropEmailAddress", DropSelectedFeatures(drop_feature_keys=["email_address", "email_text"])),
+        ("DropEmailAddress", DropSelectedFeatures(drop_match_keys=["word_.*", "sub_.*"])),
+        #("DropPoiFeatures", DropSelectedFeatures(drop_feature_keys=["from_poi_to_this_person", "from_messages", "to_messages", "from_this_person_to_poi"])),
         ("ConvertToVector", DictVectorizer(sparse=False)),
         ("Scale", StandardScaler()),
     ])
@@ -421,12 +457,15 @@ def build_poi_id_model(features, labels):
         ("union", FeatureUnion(
             transformer_list=[
                 ("email_text", pipeline_email_text),
+                ("subjects", pipeline_subjects),
                 ("rest", pipeline_other)
             ]
         )),
+        ("Select", SelectKBest(score_func=f_classif, k=10)),
         #("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=5)),
-        #("NaiveBayes", LinearSVC(class_weight="balanced")),
-        ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=5, min_samples_leaf=2)),
+        #("SVC", LinearSVC(class_weight="balanced")),
+        #("SVC", SVC(C=1, kernel='rbf')),
+        ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=4, min_samples_leaf=1, class_weight=None)),
     ])
 
     # Fit the complete pipeline
@@ -460,7 +499,7 @@ def build_poi_id_model(features, labels):
     # Try classification only based on email texts
     pipeline_email_text_clf = Pipeline([
         ("GetEmailText", SelectFeatures(selected_feature="email_text")),
-        ("VectorizeMail", TfidfVectorizer(max_df=0.05, ngram_range=(1,1),
+        ("VectorizeMail", TfidfVectorizer(max_df=0.02, ngram_range=(1,1),
                                                stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
         #("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
         #("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=10)),
@@ -539,49 +578,49 @@ def prepare_data(data_dict, filename="data_dict.pkl", load=False):
 
     if load:
         return joblib.load(filename)
-    
-    labels = []
-    for key, value in data_dict.items():
-        labels.append(value["poi"])
 
+    # Extract email texts    
     emailtext_extractor = GetEmailText(email_part="text", from_to="from")
-
     email_texts = emailtext_extractor.transform(data_dict.values())
 
-    subject_from_extractor = GetEmailText(email_part="subject", from_to="from")
+    # Vectorize texts
+    text_vectorizer = TfidfVectorizer(max_df=0.015, min_df=1, stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")
+    text_vect = text_vectorizer.fit_transform(email_texts)
+    text_vect_words = text_vectorizer.get_feature_names()
 
+    # Extract from subjects
+    subject_from_extractor = GetEmailText(email_part="subject", from_to="from")
     subjects_from = subject_from_extractor.transform(data_dict.values())
 
+    # Vectorize from subjects
     vectorizer = DictVectorizer(sparse=False)
     subjects_from_vect = vectorizer.fit_transform(subjects_from)
-
-    selector = SelectKBest(f_classif, k=10)
-    selected_subs_from_vect = selector.fit_transform(subjects_from_vect, labels)
-    selected_subs_from = np.take(vectorizer.get_feature_names(),selector.get_support(indices=True))
+    selected_subs_from = vectorizer.get_feature_names()
     print "Selected subjects from:"
-    print selected_subs_from
+    print selected_subs_from[0:10]
 
+    # Extract to subjects
     subject_to_extractor = GetEmailText(email_part="subject", from_to="to")
-
     subjects_to = subject_to_extractor.transform(data_dict.values())
 
+    # Vectorize to subjects
     vectorizer = DictVectorizer(sparse=False)
     subjects_to_vect = vectorizer.fit_transform(subjects_to)
-
-    selector = SelectKBest(f_classif, k=10)
-    selected_subs_to_vect = selector.fit_transform(subjects_to_vect, labels)
-    selected_subs_to = np.take(vectorizer.get_feature_names(),selector.get_support(indices=True))
+    selected_subs_to = vectorizer.get_feature_names()
     print "Selected subjects to:"
-    print selected_subs_to
+    print selected_subs_to[0:10]
 
+    # Add text and subject features to data_dict
     for idx, value in enumerate(data_dict.values()):
-        value["email_text"] = email_texts[idx]
+        for idx_word, word in enumerate(text_vect_words):
+            value["word_" + word] = text_vect[idx, idx_word]
         for idx_sub, subject in enumerate(selected_subs_from):
-            value["sub_from_" + selected_subs_from.tostring()] = selected_subs_from_vect[idx, idx_sub]
+            value["sub_from_" + subject] = subjects_from_vect[idx, idx_sub]
         for idx_sub, subject in enumerate(selected_subs_to):
-            value["sub_to_" + selected_subs_to.tostring()] = selected_subs_to_vect[idx, idx_sub]
+            value["sub_to_" + subject] = subjects_to_vect[idx, idx_sub]
         value.pop("email_address", None)
 
+    # Save data to file
     joblib.dump(data_dict, filename)
     return data_dict
 
@@ -689,6 +728,17 @@ if __name__ =="__main__":
         for key, value in data_dict.items():
             if value["email_address"]=="NaN" or value["email_address"] in email_missing:
                 data_dict.pop(key,None)
+
+        # Remove data with all missing values
+        for key, value in data_dict.items():
+            has_values = False
+            for subkey, subval in value.items():
+                if subkey != "email_address" and subval=="NaN":
+                    has_values = True
+                    break
+            if not has_values:
+                data_dict.pop(key,None)
+
         # Set to False to run on full sample
         if False:
             sample_to_use = dict(data_dict.items()[0:20])
