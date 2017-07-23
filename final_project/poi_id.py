@@ -6,7 +6,7 @@ import pickle
 from time import time
 #from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, StratifiedKFold
+from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict, GridSearchCV, StratifiedKFold
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectPercentile, SelectKBest, f_classif
@@ -18,6 +18,7 @@ from sklearn.naive_bayes import GaussianNB, MultinomialNB
 from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.decomposition import TruncatedSVD
+from sklearn.ensemble import RandomForestClassifier
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -62,10 +63,13 @@ class StripKeys(BaseEstimator, TransformerMixin):
 
 class GetEmailText(BaseEstimator, TransformerMixin):
     """ extract email texts for person """
-    def __init__(self, email_part="text"):
+    def __init__(self, email_part="text", from_to="from"):
         if email_part not in ("text", "subject"):
             raise ValueError("email_part must be either 'text' or 'subject'")
         self.email_part = email_part
+        if from_to not in ("from", "to"):
+            raise ValueError("from_to must be either 'from' or 'to'")
+        self.from_to = from_to
 
     def parseOutText(self, f):
         """ given an opened email file f, parse out all text below the
@@ -136,8 +140,9 @@ class GetEmailText(BaseEstimator, TransformerMixin):
         set_ob_subjects = set()
         for item in features:
             email_address = item["email_address"]
+            email_filename = "emails_by_address/" + self.from_to + "_" + email_address + ".txt"
             try:
-                with open("emails_by_address/from_" + email_address + ".txt", "r") as from_person:
+                with open(email_filename, "r") as from_person:
                     if self.email_part == "text": 
                         email_text = ""
                     else:
@@ -145,20 +150,26 @@ class GetEmailText(BaseEstimator, TransformerMixin):
                     for path in from_person:
                         path = path.replace("enron_mail_20110402/", "")
                         path = os.path.join('..', path[:-1])
-                        print path
-                        email = open(path, "r")
+                        #print path
+                        try:
+                            email = open(path, "r")
 
-                        ### Maybe use str.replace() to remove any instances of the words
-                        ### use parseOutText to extract the text from the opened email
-                        if self.email_part == "text":
-                            email_text = " ".join([email_text, self.parseOutText(email)])
-                        else:
-                            email_text[self.parse_out_subject(email)]=1
-                        email.close()
-                    ### append the text to word_data
-                new_features.append(email_text)
+                            ### Maybe use str.replace() to remove any instances of the words
+                            ### use parseOutText to extract the text from the opened email
+                            if self.email_part == "text":
+                                email_text = " ".join([email_text, self.parseOutText(email)])
+                            else:
+                                if self.parse_out_subject(email) in email_text.keys():
+                                    email_text[self.parse_out_subject(email)]+=1
+                                else:
+                                    email_text[self.parse_out_subject(email)]=1
+                            email.close()
+                        except IOError:
+                            print email + " not found"
+                        ### append the text to word_data
+                    new_features.append(email_text)
             except IOError:
-                print "File not found"
+                print email_filename + " not found"
                 if self.email_part == "text":
                     new_features.append("")
                 else:
@@ -368,7 +379,7 @@ def build_poi_id_model(features, labels):
 
     features_train, features_test, labels_train, labels_test = \
         train_test_split(features, labels, test_size=0.1, 
-            random_state=42,
+            random_state=123456,
             stratify=labels
             )
 
@@ -387,10 +398,11 @@ def build_poi_id_model(features, labels):
     # then, convert result to dense array (needed for some classifiers)
     pipeline_email_text = Pipeline([
         ("GetEmailText", SelectFeatures(selected_feature="email_text")),
-        ("VectorizeMail", TfidfVectorizer(sublinear_tf=True, max_df=0.5,
+        ("VectorizeMail", TfidfVectorizer(max_df=0.1, min_df=1,
                                 stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
-        ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=5)),
-        #("NaiveBayes", MultinomialNBTransformer(alpha=1.)),
+        ("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=80)),
+        ("NaiveBayes", MultinomialNBTransformer(alpha=1,fit_prior=False)),
+        ("Scale", StandardScaler()),
     ])
     
     # Process other features
@@ -400,7 +412,7 @@ def build_poi_id_model(features, labels):
     pipeline_other = Pipeline([
         ("DropEmailAddress", DropSelectedFeatures(drop_feature_keys=["email_address", "email_text"])),
         ("ConvertToVector", DictVectorizer(sparse=False)),
-        ("Scale", StandardScaler())
+        ("Scale", StandardScaler()),
     ])
 
     # Combine email text features and other features
@@ -412,8 +424,9 @@ def build_poi_id_model(features, labels):
                 ("rest", pipeline_other)
             ]
         )),
-        #("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=7)),
-        ("NaiveBayes", LinearSVC(class_weight="balanced")),
+        #("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=5)),
+        #("NaiveBayes", LinearSVC(class_weight="balanced")),
+        ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=5, min_samples_leaf=2)),
     ])
 
     # Fit the complete pipeline
@@ -434,7 +447,10 @@ def build_poi_id_model(features, labels):
     #    % (time() - start, len(grid_search_union.cv_results_['params'])))
     #report(grid_search_union.cv_results_)
 
-    #scores = cross_val_score(pipeline_union, features, labels, cv=5)
+    pred = cross_val_predict(pipeline_union, features, labels, cv=10)
+    print confusion_matrix(labels, pred)
+    print classification_report(labels, pred)
+    print "Accuracy: ", accuracy_score(labels, pred)
     #print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
     # Dump word features selected by email text pipeline
@@ -459,14 +475,15 @@ def build_poi_id_model(features, labels):
     #print "Scores:"
     #print scores
 
-    pipeline_union.fit(features_train, labels_train)
-    pred = pipeline_union.predict(features_test)
-    pred_train = pipeline_union.predict(features_train)
-    
-    print confusion_matrix(labels_test, pred)
-    print confusion_matrix(labels_train, pred_train)
-    print classification_report(labels_test, pred)
-    print "Accuracy: ", accuracy_score(labels_test, pred)
+    #pipeline_union.fit(features_train, labels_train)
+    #pred = pipeline_union.predict(features_test)
+    #pred_train = pipeline_union.predict(features_train)
+
+    #print confusion_matrix(labels_test, pred)
+    #print confusion_matrix(labels_train, pred_train)
+    #print confusion_matrix(labels, pred)
+    #print classification_report(labels_test, pred)
+    #print "Accuracy: ", accuracy_score(labels_test, pred)
 
     #print "Transforming features to email text"
     #email_texts = pipeline_email_text_clf.named_steps["GetEmailText"].transform(features_train)
@@ -523,21 +540,46 @@ def prepare_data(data_dict, filename="data_dict.pkl", load=False):
     if load:
         return joblib.load(filename)
     
-    emailtext_extractor = GetEmailText(email_part="text")
+    labels = []
+    for key, value in data_dict.items():
+        labels.append(value["poi"])
+
+    emailtext_extractor = GetEmailText(email_part="text", from_to="from")
 
     email_texts = emailtext_extractor.transform(data_dict.values())
 
-    subject_extractor = GetEmailText(email_part="subject")
+    subject_from_extractor = GetEmailText(email_part="subject", from_to="from")
 
-    subjects = subject_extractor.transform(data_dict.values())
+    subjects_from = subject_from_extractor.transform(data_dict.values())
 
-    vect_subject = DictVectorizer(sparse=False)
-    subjects_vect = vect_subject.fit_transform(subjects)
-    print vect_subject.get_feature_names()
+    vectorizer = DictVectorizer(sparse=False)
+    subjects_from_vect = vectorizer.fit_transform(subjects_from)
+
+    selector = SelectKBest(f_classif, k=10)
+    selected_subs_from_vect = selector.fit_transform(subjects_from_vect, labels)
+    selected_subs_from = np.take(vectorizer.get_feature_names(),selector.get_support(indices=True))
+    print "Selected subjects from:"
+    print selected_subs_from
+
+    subject_to_extractor = GetEmailText(email_part="subject", from_to="to")
+
+    subjects_to = subject_to_extractor.transform(data_dict.values())
+
+    vectorizer = DictVectorizer(sparse=False)
+    subjects_to_vect = vectorizer.fit_transform(subjects_to)
+
+    selector = SelectKBest(f_classif, k=10)
+    selected_subs_to_vect = selector.fit_transform(subjects_to_vect, labels)
+    selected_subs_to = np.take(vectorizer.get_feature_names(),selector.get_support(indices=True))
+    print "Selected subjects to:"
+    print selected_subs_to
+
     for idx, value in enumerate(data_dict.values()):
         value["email_text"] = email_texts[idx]
-        for idx_sub, subject in enumerate(vect_subject.get_feature_names()):
-            value["sub_" + subject] = subjects_vect[idx, idx_sub]
+        for idx_sub, subject in enumerate(selected_subs_from):
+            value["sub_from_" + selected_subs_from.tostring()] = selected_subs_from_vect[idx, idx_sub]
+        for idx_sub, subject in enumerate(selected_subs_to):
+            value["sub_to_" + selected_subs_to.tostring()] = selected_subs_to_vect[idx, idx_sub]
         value.pop("email_address", None)
 
     joblib.dump(data_dict, filename)
@@ -590,13 +632,70 @@ if __name__ =="__main__":
         # drop TOTAL dataset:
         data_dict.pop("TOTAL",None)
 
+        # remove files without emails
+        # list with email_addresses not n data set:
+        email_missing = [
+            "steven.elliott@enron.com",
+            "dick.westfahl@enron.com",
+            "kristina.mordaunt@enron.com",
+            "john.wodraska@enron.com",
+            "john.echols@enron.com",
+            "michael.kopper@enron.com",
+            "david.berberian@enron.com",
+            "timothy.detmering@enron.com",
+            "joe.gold@enron.com",
+            "joe.kishkill@enron.com",
+            "tod.lindholm@enron.com",
+            "bob.butts@enron.com",
+            "robert.hermann@enron.com",
+            "matthew.scrimshaw@enron.com",
+            "andrew.fastow@enron.com",
+            "jere.overdyke@enron.com",
+            "frank.stabler@enron.com",
+            "james.prentice@enron.com",
+            "thomas.white@enron.com",
+            "diomedes.christodoulou@enron.com",
+            "richard.dimichele@enron.com",
+            "scott.yeager@enron.com",
+            "joe.hirko@enron.com",
+            "lou.pai@enron.com",
+            "frank.bay@enron.com",
+            "steven.elliott@enron.com",
+            "kristina.mordaunt@enron.com",
+            "dick.westfahl@enron.com",
+            "john.wodraska@enron.com",
+            "john.echols@enron.com",
+            "michael.kopper@enron.com",
+            "david.berberian@enron.com",
+            "timothy.detmering@enron.com",
+            "joe.gold@enron.com",
+            "joe.kishkill@enron.com",
+            "tod.lindholm@enron.com",
+            "bob.butts@enron.com",
+            "robert.hermann@enron.com",
+            "matthew.scrimshaw@enron.com",
+            "andrew.fastow@enron.com",
+            "jere.overdyke@enron.com",
+            "frank.stabler@enron.com",
+            "james.prentice@enron.com",
+            "thomas.white@enron.com",
+            "diomedes.christodoulou@enron.com",
+            "richard.dimichele@enron.com",
+            "scott.yeager@enron.com",
+            "joe.hirko@enron.com",
+            "lou.pai@enron.com",
+            "frank.bay@enron.com",
+        ]
+        for key, value in data_dict.items():
+            if value["email_address"]=="NaN" or value["email_address"] in email_missing:
+                data_dict.pop(key,None)
         # Set to False to run on full sample
         if False:
             sample_to_use = dict(data_dict.items()[0:20])
         else:
             sample_to_use = data_dict
 
-        my_dataset = prepare_data(sample_to_use, load=False)
+        my_dataset = prepare_data(sample_to_use, load=True)
         #print my_dataset
         # Split label
         features = []
