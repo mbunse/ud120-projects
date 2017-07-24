@@ -97,10 +97,10 @@ class GetEmailText(BaseEstimator, TransformerMixin):
             text_string = content[1]
             ## remove mails that are forwarded or to which are responded
             # e.g. ---------------------- Forwarded"
-            text_string = re.split("-*\sForwarded", text_string, maxsplit=1)[0]
+            text_string = re.split(r"-*\sForwarded", text_string, maxsplit=1)[0]
 
             # -----Original Message-----
-            text_string = re.split("-*\Original\sMessage", text_string, maxsplit=1)[0]
+            text_string = re.split(r"-*\Original\sMessage", text_string, maxsplit=1)[0]
 
             # Vince J Kaminski@ECT
             # 04/30/2001 02:28 PM
@@ -111,7 +111,7 @@ class GetEmailText(BaseEstimator, TransformerMixin):
             # 04/30/2001 02:28 PM
             # to:	Stanley Horton/Corp/Enron@Enron, Danny McCarty/ET&S/Enron@Enron
             # cc:	Vince J Kaminski/HOU/ECT@ECT 
-            text_string = re.split("((.*\n){2})[Tt]o:\s", text_string, maxsplit=1)[0]
+            text_string = re.split(r"((.*\n){2})[Tt]o:\s", text_string, maxsplit=1)[0]
             
             # remove punctuation
             text_string = text_string.translate(None, string.punctuation)
@@ -130,9 +130,11 @@ class GetEmailText(BaseEstimator, TransformerMixin):
         f.seek(0)  ### go back to beginning of file (annoying)
         all_text = f.read()
         ### split off metadata
-        match = re.search("^Subject: ((Re:|Fwd:|Fw:)* *)*(?P<subject>.*)$", all_text, re.IGNORECASE | re.MULTILINE)
+        match = re.search(r"^Subject: ((Re:|Fwd:|Fw:)* *)*(?P<subject>.*)$", all_text, re.IGNORECASE | re.MULTILINE)
         if match.lastgroup == "subject":
-            return match.group("subject")
+            text_string = match.group("subject")
+            text_string = text_string.translate(None, string.punctuation)
+            return text_string
         return ""
 
     def fit(self, x, y=None):
@@ -147,10 +149,7 @@ class GetEmailText(BaseEstimator, TransformerMixin):
             email_filename = "emails_by_address/" + self.from_to + "_" + email_address + ".txt"
             try:
                 with open(email_filename, "r") as from_person:
-                    if self.email_part == "text": 
-                        email_text = ""
-                    else:
-                        email_text = {}
+                    email_text = ""
                     for path in from_person:
                         path = path.replace("enron_mail_20110402/", "")
                         path = os.path.join('..', path[:-1])
@@ -163,21 +162,17 @@ class GetEmailText(BaseEstimator, TransformerMixin):
                             if self.email_part == "text":
                                 email_text = " ".join([email_text, self.parseOutText(email)])
                             else:
-                                if self.parse_out_subject(email) in email_text.keys():
-                                    email_text[self.parse_out_subject(email)]+=1
-                                else:
-                                    email_text[self.parse_out_subject(email)]=1
+                                email_text = ",".join([email_text, self.parse_out_subject(email)])
                             email.close()
                         except IOError:
                             print email + " not found"
                         ### append the text to word_data
+                    #print "email_text"
+                    #print email_text
                     new_features.append(email_text)
             except IOError:
                 print email_filename + " not found"
-                if self.email_part == "text":
-                    new_features.append("")
-                else:
-                    new_features.append({})
+                new_features.append("")
         return new_features
 
 class DropSelectedFeatures(BaseEstimator, TransformerMixin):
@@ -192,8 +187,11 @@ class DropSelectedFeatures(BaseEstimator, TransformerMixin):
 
     def transform(self, x):
         reduced_features = []
+        i_item = 0
         for item in x:
             new_item = {}
+            i_item += 1
+            print "item: ", i_item
             for key, value in item.items():
                 if key not in self.drop_feature_keys:
                     if value=="NaN":
@@ -202,6 +200,12 @@ class DropSelectedFeatures(BaseEstimator, TransformerMixin):
             reduced_features.append(new_item)
         return reduced_features
 
+    def fit_transform(self, x, y=None):
+        self.fit(x, y)
+        return self.transform(x)
+
+    def get_feature_names(self):
+        return self.drop_feature_keys
 
 class SelectFeatures(BaseEstimator, TransformerMixin):
     def __init__(self, selected_feature):
@@ -214,6 +218,22 @@ class SelectFeatures(BaseEstimator, TransformerMixin):
         reduced_features = []
         for item in x:
             reduced_features.append(item[self.selected_feature])
+        return reduced_features
+
+class SelectFeatureList(BaseEstimator, TransformerMixin):
+    def __init__(self, selected_feature_list):
+        self.selected_feature_list = selected_feature_list
+
+    def fit(self, x, y=None):
+        return self
+
+    def transform(self, x):
+        reduced_features = []
+        for item in x:
+            new_item = {}
+            for key in self.selected_feature_list:
+                new_item[key] = item[key]
+            reduced_features.append(new_item)
         return reduced_features
 
 class SelectMatchFeatures(BaseEstimator, TransformerMixin):
@@ -232,7 +252,7 @@ class SelectMatchFeatures(BaseEstimator, TransformerMixin):
             sample_features = []
             for key in self.match_keys:
                 sample_features.append(item[key])
-            
+
             reduced_features.append(sample_features)
 
         return np.asanyarray(reduced_features)
@@ -241,11 +261,11 @@ class SelectMatchFeatures(BaseEstimator, TransformerMixin):
         return self.match_keys
 
 class TfidfVectorizerForFeature(TfidfVectorizer):
-    
+
     def __init__(self, word_data_key="email_text", **kwargs):
         self.word_data_key = word_data_key
         TfidfVectorizer.__init__(self, **kwargs)
-    
+
     def transform(self, x):
         word_data = [item[self.word_data_key] for item in x]
         word_features = super(TfidfVectorizer, self).transform(word_data)
@@ -255,13 +275,13 @@ class TfidfVectorizerForFeature(TfidfVectorizer):
             for key, value in item:
                 if key != self.word_data_key:
                     new_item[key] = value
-            new_item["word_features"]=word_features[idx]
+            new_item["word_features"] = word_features[idx]
             new_features.append(new_item)
         return new_features
 
     def fit(self, x, y=None):
         fit_transform(self, x, y=None)
-        return self 
+        return self
     def fit_transform(self, x, y=None):
         word_data = [item[self.word_data_key] for item in x]
         word_features = super(TfidfVectorizer, self).fit_transform(word_data, y)
@@ -269,16 +289,16 @@ class TfidfVectorizerForFeature(TfidfVectorizer):
         for idx, item in enumerate(x):
             item.pop(self.word_data_key, None)
             new_item = item
-            new_item["word_features"]=word_features[idx]
+            new_item["word_features"] = word_features[idx]
             new_features.append(new_item)
         return new_features
 
 
 class TfidfVectorizerDebug(TfidfVectorizer):
-    
+
     def __init__(self, **kwargs):
         TfidfVectorizer.__init__(self, **kwargs)
-    
+
     def transform(self, x):
         print "TfidfVectorizerDebug.transform"
         print len(x)
@@ -288,7 +308,7 @@ class TfidfVectorizerDebug(TfidfVectorizer):
         print "TfidfVectorizerDebug.fit"
         print len(x)
         fit_transform(self, x, y=None)
-        return self 
+        return self
     def fit_transform(self, x, y=None):
         print "TfidfVectorizerDebug.fit_transform"
         print len(x)
@@ -305,7 +325,7 @@ class SelectPercentileForFeature(SelectPercentile):
         word_features = [item[self.word_features_key] for item in x]
         word_features = sparse_vstack(word_features)
         super(SelectPercentile, self).fit(word_features, y)
-        return self 
+        return self
     def transform(self, x):
         word_features = [item[self.word_features_key] for item in x]
         word_features = sparse_vstack(word_features)
@@ -314,7 +334,7 @@ class SelectPercentileForFeature(SelectPercentile):
         for idx, item in enumerate(x):
             item.pop(self.word_features_key, None)
             new_item = item
-            new_item["word_features_transformed"]=word_features_transformed[idx].toarray()
+            new_item["word_features_transformed"] = word_features_transformed[idx].toarray()
             new_features.append(new_item)
         return new_features
 
@@ -338,7 +358,7 @@ class PersistAndLoadVector(BaseEstimator, TransformerMixin):
         if (load or persist) and filename == None:
             raise ValueError("No filename given but persist or load set to true.")
         else:
-            self.filename = filename 
+            self.filename = filename
 
     def fit(self, x, y=None):
         if self.persist:
@@ -349,7 +369,7 @@ class PersistAndLoadVector(BaseEstimator, TransformerMixin):
     def fit_transform(self, x, y=None):
         if self.persist:
             print "Dumping vector"
-            joblib.dump(x, self.filename)          
+            joblib.dump(x, self.filename)
         if self.load:
             print "fit_transform: Loading vector"
             vec = joblib.load(self.filename)
@@ -361,7 +381,7 @@ class PersistAndLoadVector(BaseEstimator, TransformerMixin):
     def transform(self, x):
         if self.persist:
             print "Dumping vector"
-            joblib.dump(x, self.filename)          
+            joblib.dump(x, self.filename)
         if self.load:
             print "transform: Loading vector"
             vec = joblib.load(self.filename)
@@ -369,12 +389,11 @@ class PersistAndLoadVector(BaseEstimator, TransformerMixin):
             return vec
         else:
             return x
-    
 
 class MultinomialNBTransformer(MultinomialNB):
     def __init__(self, alpha=1.0, fit_prior=True, class_prior=None):
         MultinomialNB.__init__(self, alpha, fit_prior, class_prior)
-    
+
     def transform(self, x):
         pred = self.predict(x)
         new_features = []
@@ -383,7 +402,7 @@ class MultinomialNBTransformer(MultinomialNB):
         return new_features
 
     def fit_transform(self, x, y):
-        self.fit(x,y)
+        self.fit(x, y)
         pred = self.transform(x)
         return pred
 
@@ -397,12 +416,12 @@ def report(results, n_top=3):
     for i in range(1, n_top + 1):
         candidates = np.flatnonzero(results['rank_test_score'] == i)
         for candidate in candidates:
-            print("Model with rank: {0}".format(i))
-            print("Mean validation score: {0:.3f} (std: {1:.3f})".format(
+            print "Model with rank: {0}".format(i)
+            print "Mean validation score: {0:.3f} (std: {1:.3f})".format(
                   results['mean_test_score'][candidate],
-                  results['std_test_score'][candidate]))
-            print("Parameters: {0}".format(results['params'][candidate]))
-            print("")
+                  results['std_test_score'][candidate])
+            print "Parameters: {0}".format(results['params'][candidate])
+            print ""
 
 def build_poi_id_model(features, labels):
 
@@ -410,13 +429,13 @@ def build_poi_id_model(features, labels):
     splitter = StratifiedKFold(n_splits=10)
 
     features_train, features_test, labels_train, labels_test = \
-        train_test_split(features, labels, test_size=0.05, 
-            random_state=123456,
-            stratify=labels
-            )
+        train_test_split(features, labels, test_size=0.05,
+                         random_state=123456,
+                         stratify=labels
+                        )
 
     # Setting for persistance
-    # In the persistance run, texts from emails are extracted for 
+    # In the persistance run, texts from emails are extracted for
     # training and testing data sets and the results are persisted
     # to files.
     # If not in persistance run, these files are only loaded and
@@ -432,10 +451,10 @@ def build_poi_id_model(features, labels):
         ("GetEmailText", SelectMatchFeatures(feature_match="word_.*")),
         #("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=10)),
         ("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
-        ("NaiveBayes", MultinomialNBTransformer(alpha=1,fit_prior=False)),
+        ("NaiveBayes", MultinomialNBTransformer(alpha=1, fit_prior=False)),
         ("Scale", StandardScaler()),
     ])
-    
+
     pipeline_subjects = Pipeline([
         ("GetEmailText", SelectMatchFeatures(feature_match="sub_.*")),
         ("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
@@ -445,7 +464,30 @@ def build_poi_id_model(features, labels):
     # load the email texts
     # then, convert dictionary to dense vector
     pipeline_other = Pipeline([
-        ("DropEmailAddress", DropSelectedFeatures(drop_match_keys=["word_.*", "sub_.*"])),
+        ("Selector", 
+         SelectFeatureList(
+             selected_feature_list=[
+                                    'salary',
+                                    'deferral_payments',
+                                    'total_payments',
+                                    'loan_advances',
+                                    'bonus',
+                                    'restricted_stock_deferred',
+                                    'deferred_income',
+                                    'total_stock_value',
+                                    'expenses',
+                                    'exercised_stock_options',
+                                    'other',
+                                    'long_term_incentive',
+                                    'restricted_stock',
+                                    'director_fees'
+                                   ] +
+                                   ['to_messages',
+                                    'from_poi_to_this_person',
+                                    'from_messages',
+                                    'from_this_person_to_poi',
+                                    'shared_receipt_with_poi'
+                                   ])),
         #("DropPoiFeatures", DropSelectedFeatures(drop_feature_keys=["from_poi_to_this_person", "from_messages", "to_messages", "from_this_person_to_poi"])),
         ("ConvertToVector", DictVectorizer(sparse=False)),
         ("Scale", StandardScaler()),
@@ -465,14 +507,17 @@ def build_poi_id_model(features, labels):
         #("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=5)),
         #("SVC", LinearSVC(class_weight="balanced")),
         #("SVC", SVC(C=1, kernel='rbf')),
-        ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=4, min_samples_leaf=1, class_weight=None)),
+        ("DecisionTree", RandomForestClassifier(n_estimators=10,
+                                                min_samples_split=4,
+                                                min_samples_leaf=1,
+                                                class_weight=None)),
     ])
 
     # Fit the complete pipeline
     # Test accuracy of model
     param_grid_union = {
         "union__email_text__VectorizeMail__max_df": [0.02],
-        "union__email_text__VectorizeMail__ngram_range": [(1,1), (1,5), (2,5)],
+        "union__email_text__VectorizeMail__ngram_range": [(1, 1), (1, 5), (2, 5)],
         "union__email_text__SelectPercentile__percentile": [2],
         "union__email_text__NaiveBayes__alpha": [1],
         "KNeighborsClassifier__n_neighbors": [5],
@@ -561,7 +606,7 @@ def build_poi_id_model(features, labels):
 
     return
 
-def prepare_data(data_dict, filename="data_dict.pkl", load=False):
+def prepare_data(data_dict, filename="data_dict.pkl", load=True):
     """ 
     If load is false, function takes basic input data, adds features,
     persists the final data and returns the data.
@@ -585,6 +630,7 @@ def prepare_data(data_dict, filename="data_dict.pkl", load=False):
 
     # Vectorize texts
     text_vectorizer = TfidfVectorizer(max_df=0.015, min_df=1, stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")
+    #text_vectorizer = TfidfVectorizer(max_df=0.5, min_df=1, stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")
     text_vect = text_vectorizer.fit_transform(email_texts)
     text_vect_words = text_vectorizer.get_feature_names()
 
@@ -593,9 +639,14 @@ def prepare_data(data_dict, filename="data_dict.pkl", load=False):
     subjects_from = subject_from_extractor.transform(data_dict.values())
 
     # Vectorize from subjects
-    vectorizer = DictVectorizer(sparse=False)
-    subjects_from_vect = vectorizer.fit_transform(subjects_from)
-    selected_subs_from = vectorizer.get_feature_names()
+    sub_vectorizer = TfidfVectorizer(max_df=0.015, min_df=1, token_pattern=r"[^,]+")
+    #sub_vectorizer = TfidfVectorizer(max_df=0.5, min_df=1, token_pattern=r"[^,]+")
+    subjects_from_vect = sub_vectorizer.fit_transform(subjects_from)
+    selected_subs_from = sub_vectorizer.get_feature_names()
+
+    #vectorizer = DictVectorizer(sparse=False)
+    #subjects_from_vect = vectorizer.fit_transform(subjects_from)
+    #selected_subs_from = vectorizer.get_feature_names()
     print "Selected subjects from:"
     print selected_subs_from[0:10]
 
@@ -604,9 +655,8 @@ def prepare_data(data_dict, filename="data_dict.pkl", load=False):
     subjects_to = subject_to_extractor.transform(data_dict.values())
 
     # Vectorize to subjects
-    vectorizer = DictVectorizer(sparse=False)
-    subjects_to_vect = vectorizer.fit_transform(subjects_to)
-    selected_subs_to = vectorizer.get_feature_names()
+    subjects_to_vect = sub_vectorizer.fit_transform(subjects_to)
+    selected_subs_to = sub_vectorizer.get_feature_names()
     print "Selected subjects to:"
     print selected_subs_to[0:10]
 
@@ -672,7 +722,7 @@ if __name__ =="__main__":
         data_dict.pop("TOTAL",None)
 
         # remove files without emails
-        # list with email_addresses not n data set:
+        # list with email_addresses not in data set:
         email_missing = [
             "steven.elliott@enron.com",
             "dick.westfahl@enron.com",
