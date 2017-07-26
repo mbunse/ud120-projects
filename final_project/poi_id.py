@@ -11,11 +11,11 @@ from tester import dump_classifier_and_data
 from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict, GridSearchCV, StratifiedKFold
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_selection import SelectPercentile, SelectKBest, f_classif
+from sklearn.feature_selection import SelectFromModel, SelectPercentile, SelectKBest, f_classif
 from sklearn.externals import joblib
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, FunctionTransformer, Imputer
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
 from sklearn.svm import LinearSVC, SVC
 from sklearn.neighbors import KNeighborsClassifier
@@ -195,8 +195,8 @@ class DropSelectedFeatures(BaseEstimator, TransformerMixin):
             for key, value in item.items():
                 if key not in self.drop_feature_keys:
                     if value=="NaN":
-                        value = 0
-                    new_item[key] = float(value)
+                        value = np.nan
+                    new_item[key] = np.float(value)
             reduced_features.append(new_item)
         return reduced_features
 
@@ -221,8 +221,9 @@ class SelectFeatures(BaseEstimator, TransformerMixin):
         return reduced_features
 
 class SelectFeatureList(BaseEstimator, TransformerMixin):
-    def __init__(self, selected_feature_list):
+    def __init__(self, selected_feature_list, convert_to_numeric=False):
         self.selected_feature_list = selected_feature_list
+        self.convert_to_numeric = convert_to_numeric
 
     def fit(self, x, y=None):
         return self
@@ -232,14 +233,21 @@ class SelectFeatureList(BaseEstimator, TransformerMixin):
         for item in x:
             new_item = {}
             for key in self.selected_feature_list:
-                new_item[key] = item[key]
+                if self.convert_to_numeric:
+                    if item[key]=="NaN":
+                        new_item[key] = np.nan
+                    else:
+                        new_item[key] = np.float(item[key])
+                else:
+                    new_item[key] = item[key]
             reduced_features.append(new_item)
         return reduced_features
 
 class SelectMatchFeatures(BaseEstimator, TransformerMixin):
-    def __init__(self, feature_match):
+    def __init__(self, feature_match, convert_to_numeric=False):
         self.feature_match = feature_match
         self.match_keys = None
+        self.convert_to_numeric = convert_to_numeric
 
     def fit(self, x, y=None):
         # calculate match keys from first element
@@ -251,8 +259,13 @@ class SelectMatchFeatures(BaseEstimator, TransformerMixin):
         for item in x:
             sample_features = []
             for key in self.match_keys:
-                sample_features.append(item[key])
+                if self.convert_to_numeric:
+                    if item[key]=="NaN":
+                        item[key] = np.nan
+                    else:
+                        item[key] = np.float(item[key])
 
+                sample_features.append(item[key])
             reduced_features.append(sample_features)
 
         return np.asanyarray(reduced_features)
@@ -406,6 +419,27 @@ class MultinomialNBTransformer(MultinomialNB):
         pred = self.transform(x)
         return pred
 
+class KNeighborsTransformer(KNeighborsClassifier):
+    def __init__(self, n_neighbors=5,
+                 weights='uniform', algorithm='auto', leaf_size=30,
+                 p=2, metric='minkowski', metric_params=None, n_jobs=1,
+                 **kwargs):
+        KNeighborsClassifier.__init__(self, n_neighbors,
+                 weights, algorithm, leaf_size,
+                 p, metric, metric_params, n_jobs,
+                 **kwargs)
+
+    def transform(self, x):
+        pred = self.predict(x)
+        new_features = []
+        for item in pred:
+            new_features.append([item])
+        return new_features
+
+    def fit_transform(self, x, y):
+        self.fit(x, y)
+        pred = self.transform(x)
+        return pred
 
 def report(results, n_top=3):
     """
@@ -450,47 +484,45 @@ def build_poi_id_model(features, labels):
     pipeline_email_text = Pipeline([
         ("GetEmailText", SelectMatchFeatures(feature_match="word_.*")),
         #("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=10)),
-        ("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
-        ("NaiveBayes", MultinomialNBTransformer(alpha=1, fit_prior=False)),
-        ("Scale", StandardScaler()),
+        ("SelectPercentile", SelectKBest(score_func=f_classif, k=20)),
+        #("SVC", SelectFromModel(LinearSVC(class_weight="balanced", C=0.7), threshold=0.25)),
+        ("NaiveBayes", SelectFromModel(MultinomialNB(alpha=1, fit_prior=False), threshold=0.5)),
+        #("NaiveBayes", MultinomialNBTransformer(alpha=1, fit_prior=False)),
+        #("Scale", StandardScaler()),
     ])
 
     pipeline_subjects = Pipeline([
         ("GetEmailText", SelectMatchFeatures(feature_match="sub_.*")),
         ("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
+        #("NaiveBayes", SelectFromModel(MultinomialNB(alpha=1, fit_prior=False))),
+        #("NaiveBayes", MultinomialNBTransformer(alpha=1, fit_prior=False)),
+        #("Scale", StandardScaler())
     ])
+    # Process financial features
+    pipeline_financial = Pipeline([
+        ("Selector", 
+         SelectFeatureList(selected_feature_list=FEATURES_FINANCIAL, convert_to_numeric=True)),
+        ("ConvertToVector", DictVectorizer(sparse=False)),
+        ("Imputer", Imputer(strategy="median")),
+        #("Log1P", FunctionTransformer(func=lambda x: np.log1p(np.abs(x)))),
+        #("StandardScaler", StandardScaler())
+    ])
+
+
     # Process other features
     # First, drop email_adress feature, which is only needed to
     # load the email texts
     # then, convert dictionary to dense vector
-    pipeline_other = Pipeline([
+    pipeline_email = Pipeline([
         ("Selector", 
          SelectFeatureList(
-             selected_feature_list=[
-                                    'salary',
-                                    'deferral_payments',
-                                    'total_payments',
-                                    'loan_advances',
-                                    'bonus',
-                                    'restricted_stock_deferred',
-                                    'deferred_income',
-                                    'total_stock_value',
-                                    'expenses',
-                                    'exercised_stock_options',
-                                    'other',
-                                    'long_term_incentive',
-                                    'restricted_stock',
-                                    'director_fees'
-                                   ] +
-                                   ['to_messages',
-                                    'from_poi_to_this_person',
-                                    'from_messages',
-                                    'from_this_person_to_poi',
-                                    'shared_receipt_with_poi'
-                                   ])),
-        #("DropPoiFeatures", DropSelectedFeatures(drop_feature_keys=["from_poi_to_this_person", "from_messages", "to_messages", "from_this_person_to_poi"])),
+             selected_feature_list=FEATURES_EMAIL, convert_to_numeric=True)),
         ("ConvertToVector", DictVectorizer(sparse=False)),
-        ("Scale", StandardScaler()),
+        ("Imputer", Imputer(strategy="median")),
+        #("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
+        #("Scale", StandardScaler()),
+        #("KNeighbors", KNeighborsTransformer(n_neighbors=5)),
+        #("Scale2", StandardScaler()),
     ])
 
     # Combine email text features and other features
@@ -498,19 +530,18 @@ def build_poi_id_model(features, labels):
     pipeline_union = Pipeline([
         ("union", FeatureUnion(
             transformer_list=[
-                ("email_text", pipeline_email_text),
+                #("email_text", pipeline_email_text),
                 ("subjects", pipeline_subjects),
-                ("rest", pipeline_other)
+                #("financial", pipeline_financial),
+                ("email",pipeline_email),
             ]
         )),
-        ("Select", SelectKBest(score_func=f_classif, k=10)),
+        ("Scale", StandardScaler()),
+        #("Select", SelectKBest(score_func=f_classif, k=10)),
         #("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=5)),
         #("SVC", LinearSVC(class_weight="balanced")),
         #("SVC", SVC(C=1, kernel='rbf')),
-        ("DecisionTree", RandomForestClassifier(n_estimators=10,
-                                                min_samples_split=4,
-                                                min_samples_leaf=1,
-                                                class_weight=None)),
+        ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=4, min_samples_leaf=1, class_weight=None)),
     ])
 
     # Fit the complete pipeline
@@ -530,7 +561,7 @@ def build_poi_id_model(features, labels):
     #print("GridSearchCV took %.2f seconds for %d candidate parameter settings." 
     #    % (time() - start, len(grid_search_union.cv_results_['params'])))
     #report(grid_search_union.cv_results_)
-
+    np.random.seed(42)
     pred = cross_val_predict(pipeline_union, features, labels, cv=10)
     print confusion_matrix(labels, pred)
     print classification_report(labels, pred)
@@ -629,7 +660,7 @@ def prepare_data(data_dict, filename="data_dict.pkl", load=True):
     email_texts = emailtext_extractor.transform(data_dict.values())
 
     # Vectorize texts
-    text_vectorizer = TfidfVectorizer(max_df=0.015, min_df=1, stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")
+    text_vectorizer = TfidfVectorizer(max_df=0.3, min_df=1, stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b", max_features=500)
     #text_vectorizer = TfidfVectorizer(max_df=0.5, min_df=1, stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")
     text_vect = text_vectorizer.fit_transform(email_texts)
     text_vect_words = text_vectorizer.get_feature_names()
@@ -639,7 +670,7 @@ def prepare_data(data_dict, filename="data_dict.pkl", load=True):
     subjects_from = subject_from_extractor.transform(data_dict.values())
 
     # Vectorize from subjects
-    sub_vectorizer = TfidfVectorizer(max_df=0.015, min_df=1, token_pattern=r"[^,]+")
+    sub_vectorizer = TfidfVectorizer(max_df=0.3, min_df=1, token_pattern=r"[^,]+", max_features=100)
     #sub_vectorizer = TfidfVectorizer(max_df=0.5, min_df=1, token_pattern=r"[^,]+")
     subjects_from_vect = sub_vectorizer.fit_transform(subjects_from)
     selected_subs_from = sub_vectorizer.get_feature_names()
