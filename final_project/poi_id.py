@@ -8,10 +8,12 @@ import string
 from time import time
 #from feature_format import featureFormat, targetFeatureSplit
 from tester import dump_classifier_and_data
-from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict, GridSearchCV, StratifiedKFold
+from sklearn.model_selection import train_test_split, cross_val_score,  \
+    cross_val_predict, GridSearchCV, StratifiedKFold
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_selection import SelectFromModel, SelectPercentile, SelectKBest, f_classif
+from sklearn.feature_selection import SelectFromModel, SelectPercentile, \
+    SelectKBest, f_classif
 from sklearn.externals import joblib
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
@@ -273,40 +275,6 @@ class SelectMatchFeatures(BaseEstimator, TransformerMixin):
     def get_feature_names(self):
         return self.match_keys
 
-class TfidfVectorizerForFeature(TfidfVectorizer):
-
-    def __init__(self, word_data_key="email_text", **kwargs):
-        self.word_data_key = word_data_key
-        TfidfVectorizer.__init__(self, **kwargs)
-
-    def transform(self, x):
-        word_data = [item[self.word_data_key] for item in x]
-        word_features = super(TfidfVectorizer, self).transform(word_data)
-        new_features = []
-        for idx, item in enumerate(x):
-            new_item = {}
-            for key, value in item:
-                if key != self.word_data_key:
-                    new_item[key] = value
-            new_item["word_features"] = word_features[idx]
-            new_features.append(new_item)
-        return new_features
-
-    def fit(self, x, y=None):
-        fit_transform(self, x, y=None)
-        return self
-    def fit_transform(self, x, y=None):
-        word_data = [item[self.word_data_key] for item in x]
-        word_features = super(TfidfVectorizer, self).fit_transform(word_data, y)
-        new_features = []
-        for idx, item in enumerate(x):
-            item.pop(self.word_data_key, None)
-            new_item = item
-            new_item["word_features"] = word_features[idx]
-            new_features.append(new_item)
-        return new_features
-
-
 class TfidfVectorizerDebug(TfidfVectorizer):
 
     def __init__(self, **kwargs):
@@ -327,9 +295,6 @@ class TfidfVectorizerDebug(TfidfVectorizer):
         print len(x)
         return super(TfidfVectorizer, self).fit_transform(x, y)
 
-# TODO: Put select percentile and tfidvecor in one step?
-# use SelectPercentile.get_support(indices=False) to get the indices
-# from  TfidfVectorizer.get_feature_names()
 class SelectPercentileForFeature(SelectPercentile):
     def __init__(self, word_features_key="word_features", **kwargs):
         self.word_features_key = word_features_key
@@ -350,74 +315,6 @@ class SelectPercentileForFeature(SelectPercentile):
             new_item["word_features_transformed"] = word_features_transformed[idx].toarray()
             new_features.append(new_item)
         return new_features
-
-class DenseTransformer(BaseEstimator, TransformerMixin):
-    """ https://stackoverflow.com/questions/28384680/scikit-learns-pipeline-a-sparse-matrix-was-passed-but-dense-data-is-required """
-    def transform(self, X, y=None, **fit_params):
-        return X.todense()
-
-    def fit_transform(self, X, y=None, **fit_params):
-        self.fit(X, y, **fit_params)
-        return self.transform(X)
-
-    def fit(self, X, y=None, **fit_params):
-        return self
-
-class PersistAndLoadVector(BaseEstimator, TransformerMixin):
-    """ Transformer class to dump and/or load a vector in fitting """
-    def __init__(self, filename=None, persist=False, load=False, ):
-        self.persist = persist
-        self.load = load
-        if (load or persist) and filename == None:
-            raise ValueError("No filename given but persist or load set to true.")
-        else:
-            self.filename = filename
-
-    def fit(self, x, y=None):
-        if self.persist:
-            print "Dumping vector"
-            joblib.dump(x, self.filename)
-        return self
-
-    def fit_transform(self, x, y=None):
-        if self.persist:
-            print "Dumping vector"
-            joblib.dump(x, self.filename)
-        if self.load:
-            print "fit_transform: Loading vector"
-            vec = joblib.load(self.filename)
-            print len(vec)
-            return vec
-        else:
-            return x
-
-    def transform(self, x):
-        if self.persist:
-            print "Dumping vector"
-            joblib.dump(x, self.filename)
-        if self.load:
-            print "transform: Loading vector"
-            vec = joblib.load(self.filename)
-            print len(vec)
-            return vec
-        else:
-            return x
-
-class MultinomialNBTransformer(MultinomialNB):
-    def __init__(self, alpha=1.0, fit_prior=True, class_prior=None):
-        MultinomialNB.__init__(self, alpha, fit_prior, class_prior)
-
-    def transform(self, x):
-        pred = self.predict(x)
-        new_features = []
-        for item in pred:
-            new_features.append([item])
-        return new_features
-
-    def fit_transform(self, x, y):
-        self.fit(x, y)
-        pred = self.transform(x)
-        return pred
 
 class KNeighborsTransformer(KNeighborsClassifier):
     def __init__(self, n_neighbors=5,
@@ -519,6 +416,7 @@ def build_poi_id_model(features, labels):
              selected_feature_list=FEATURES_EMAIL, convert_to_numeric=True)),
         ("ConvertToVector", DictVectorizer(sparse=False)),
         ("Imputer", Imputer(strategy="median")),
+        ("Log1P", FunctionTransformer(func=lambda x: np.log1p(np.abs(x)))),
         #("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
         #("Scale", StandardScaler()),
         #("KNeighbors", KNeighborsTransformer(n_neighbors=5)),
