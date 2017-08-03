@@ -35,19 +35,20 @@ import re
 #from parse_out_email_text import parseOutText
 
 FEATURES_FINANCIAL = ['salary',
-                      'deferral_payments',
+                      #'deferral_payments',
                       'total_payments',
-                      'loan_advances',
+                      #'loan_advances',
                       'bonus',
-                      'restricted_stock_deferred',
-                      'deferred_income',
+                      #'restricted_stock_deferred',
+                      #'deferred_income',
                       'total_stock_value',
                       'expenses',
                       'exercised_stock_options',
                       'other',
                       'long_term_incentive',
                       'restricted_stock',
-                      'director_fees']
+                      #'director_fees'
+                    ]
 FEATURES_EMAIL = ['to_messages',
                   'from_poi_to_this_person',
                   'from_messages',
@@ -651,61 +652,8 @@ if __name__ =="__main__":
         data_dict.pop("TOTAL",None)
 
         # remove files without emails
-        # list with email_addresses not in data set:
-        email_missing = [
-            "steven.elliott@enron.com",
-            "dick.westfahl@enron.com",
-            "kristina.mordaunt@enron.com",
-            "john.wodraska@enron.com",
-            "john.echols@enron.com",
-            "michael.kopper@enron.com",
-            "david.berberian@enron.com",
-            "timothy.detmering@enron.com",
-            "joe.gold@enron.com",
-            "joe.kishkill@enron.com",
-            "tod.lindholm@enron.com",
-            "bob.butts@enron.com",
-            "robert.hermann@enron.com",
-            "matthew.scrimshaw@enron.com",
-            "andrew.fastow@enron.com",
-            "jere.overdyke@enron.com",
-            "frank.stabler@enron.com",
-            "james.prentice@enron.com",
-            "thomas.white@enron.com",
-            "diomedes.christodoulou@enron.com",
-            "richard.dimichele@enron.com",
-            "scott.yeager@enron.com",
-            "joe.hirko@enron.com",
-            "lou.pai@enron.com",
-            "frank.bay@enron.com",
-            "steven.elliott@enron.com",
-            "kristina.mordaunt@enron.com",
-            "dick.westfahl@enron.com",
-            "john.wodraska@enron.com",
-            "john.echols@enron.com",
-            "michael.kopper@enron.com",
-            "david.berberian@enron.com",
-            "timothy.detmering@enron.com",
-            "joe.gold@enron.com",
-            "joe.kishkill@enron.com",
-            "tod.lindholm@enron.com",
-            "bob.butts@enron.com",
-            "robert.hermann@enron.com",
-            "matthew.scrimshaw@enron.com",
-            "andrew.fastow@enron.com",
-            "jere.overdyke@enron.com",
-            "frank.stabler@enron.com",
-            "james.prentice@enron.com",
-            "thomas.white@enron.com",
-            "diomedes.christodoulou@enron.com",
-            "richard.dimichele@enron.com",
-            "scott.yeager@enron.com",
-            "joe.hirko@enron.com",
-            "lou.pai@enron.com",
-            "frank.bay@enron.com",
-        ]
         for key, value in data_dict.items():
-            if value["email_address"]=="NaN" or value["email_address"] in email_missing:
+            if value["to_messages"]=="NaN":
                 data_dict.pop(key,None)
 
         # Remove data with all missing values
