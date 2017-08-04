@@ -355,6 +355,11 @@ def report(results, n_top=3):
             print "Parameters: {0}".format(results['params'][candidate])
             print ""
 
+def log_trans(x):
+    """ log transformation as helper function 
+    lambda function can be pickeled """
+    return np.log1p(np.abs(x))
+
 def build_poi_id_model(features, labels):
 
     # Split into training and testing
@@ -365,6 +370,7 @@ def build_poi_id_model(features, labels):
                          random_state=123456,
                          stratify=labels
                         )
+
 
     # Setting for persistance
     # In the persistance run, texts from emails are extracted for
@@ -402,8 +408,7 @@ def build_poi_id_model(features, labels):
          SelectFeatureList(selected_feature_list=FEATURES_FINANCIAL, convert_to_numeric=True)),
         ("ConvertToVector", DictVectorizer(sparse=False)),
         ("Imputer", Imputer(strategy="median")),
-        #("Log1P", FunctionTransformer(func=lambda x: np.log1p(np.abs(x)))),
-        #("StandardScaler", StandardScaler())
+        ("Log1P", FunctionTransformer(func=log_trans)),
     ])
 
 
@@ -417,11 +422,7 @@ def build_poi_id_model(features, labels):
              selected_feature_list=FEATURES_EMAIL, convert_to_numeric=True)),
         ("ConvertToVector", DictVectorizer(sparse=False)),
         ("Imputer", Imputer(strategy="median")),
-        ("Log1P", FunctionTransformer(func=lambda x: np.log1p(np.abs(x)))),
-        #("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
-        #("Scale", StandardScaler()),
-        #("KNeighbors", KNeighborsTransformer(n_neighbors=5)),
-        #("Scale2", StandardScaler()),
+        ("Log1P", FunctionTransformer(func=log_trans)),
     ])
 
     # Combine email text features and other features
@@ -445,15 +446,13 @@ def build_poi_id_model(features, labels):
 
     # Fit the complete pipeline
     # Test accuracy of model
-    param_grid_union = {
-        "union__email_text__VectorizeMail__max_df": [0.02],
-        "union__email_text__VectorizeMail__ngram_range": [(1, 1), (1, 5), (2, 5)],
-        "union__email_text__SelectPercentile__percentile": [2],
-        "union__email_text__NaiveBayes__alpha": [1],
-        "KNeighborsClassifier__n_neighbors": [5],
-        }
+    # param_grid_union = {
+    #     "DecisionTree__min_samples_split": [2,4,6],
+    #     "DecisionTree__min_samples_leaf": [1,2,4],
+    #     "DecisionTree__n_estimators": [5, 10, 20],
+    #     }
 
-    grid_search_union = GridSearchCV(pipeline_union, param_grid=param_grid_union, cv=10)
+    # grid_search_union = GridSearchCV(pipeline_union, param_grid=param_grid_union, cv=10)
     #start = time()
     #grid_search_union.fit(features, labels)
 
@@ -465,76 +464,13 @@ def build_poi_id_model(features, labels):
     print confusion_matrix(labels, pred)
     print classification_report(labels, pred)
     print "Accuracy: ", accuracy_score(labels, pred)
-    #print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
-    # Dump word features selected by email text pipeline
-    #selected_indices = pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["SelectPercentile"].get_support(indices=True)
-    #print np.take(pipeline_union.named_steps["union"].transformer_list[0][1].named_steps["VectorizeMail"].get_feature_names(),selected_indices)
+    # word_feature_names = SelectMatchFeatures(convert_to_numeric=True, feature_match="word_.*").fit(features).get_feature_names()
+    sub_feature_names = SelectMatchFeatures(convert_to_numeric=True, feature_match="sub_.*").fit(features).get_feature_names()
 
-    # Try classification only based on email texts
-    pipeline_email_text_clf = Pipeline([
-        ("GetEmailText", SelectFeatures(selected_feature="email_text")),
-        ("VectorizeMail", TfidfVectorizer(max_df=0.02, ngram_range=(1,1),
-                                               stop_words='english', token_pattern=r"\b[a-zA-Z][a-zA-Z]+\b")),
-        #("SelectPercentile", SelectKBest(score_func=f_classif, k=10)),
-        #("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=10)),
-        #("SelectPercentile", TruncatedSVD(n_components=10)),
-        #("NaiveBayes", MultinomialNB(fit_prior=False))
-        #("NaiveBayes", LinearSVC(class_weight="balanced"))
-    ])
+    features_list = FEATURES_EMAIL + sub_feature_names
 
- 
-    #scores = cross_val_score(pipeline_email_text_clf, features, labels, cv=10)
-    #print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-    #print "Scores:"
-    #print scores
-
-    #pipeline_union.fit(features_train, labels_train)
-    #pred = pipeline_union.predict(features_test)
-    #pred_train = pipeline_union.predict(features_train)
-
-    #print confusion_matrix(labels_test, pred)
-    #print confusion_matrix(labels_train, pred_train)
-    #print confusion_matrix(labels, pred)
-    #print classification_report(labels_test, pred)
-    #print "Accuracy: ", accuracy_score(labels_test, pred)
-
-    #print "Transforming features to email text"
-    #email_texts = pipeline_email_text_clf.named_steps["GetEmailText"].transform(features_train)
-    #print email_texts
-
-    #print "Vectorizing email text"
-    #text_vects = pipeline_email_text_clf.named_steps["VectorizeMail"].transform(email_texts)
-    #print text_vects
-
-    #print "Selecting features"
-    #select_text_vects = pipeline_email_text_clf.named_steps["SelectPercentile"].transform(text_vects)
-    #print select_text_vects
-
-    # Score is 0.8 for MultinomialNB, max_df=0.5, percentile=1
-    # print "Score for only email text clf: ", pipeline_email_text_clf.score(features_test, labels_test)
-    
-    # Print selected words 
-    #selected_indices = pipeline_email_text_clf.named_steps["SelectPercentile"].get_support(indices=True)
-    #print np.take(pipeline_email_text_clf.named_steps["VectorizeMail"].get_feature_names(),selected_indices)
-
-
-    param_grid_email = {
-        "VectorizeMail__max_df": [0.02],
-        "VectorizeMail__ngram_range": [(1,1), (1,5), (2,5)],
-        "SelectPercentile__percentile": [2],
-        "NaiveBayes__alpha": [1],
-        }
-    grid_search_email = GridSearchCV(pipeline_email_text_clf, param_grid=param_grid_email, cv=10)
-    start = time()
-    #grid_search_email.fit(features, labels)
-
-    #print("GridSearchCV took %.2f seconds for %d candidate parameter settings." 
-    #    % (time() - start, len(grid_search_email.cv_results_['params'])))
-    #report(grid_search_email.cv_results_)
-
-
-    return
+    return pipeline_union, features_list
 
 def prepare_data(data_dict, filename="data_dict.pkl", load=True):
     """ 
@@ -683,4 +619,7 @@ if __name__ =="__main__":
             value.pop("poi",None)
             features.append(value)
             names.append(key)
-        build_poi_id_model(features, labels)
+        clf, features_list = build_poi_id_model(features, labels)
+
+        # Dump classifier for later 
+        dump_classifier_and_data(clf, my_dataset, features_list)
