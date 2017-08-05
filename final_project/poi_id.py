@@ -441,24 +441,26 @@ def build_poi_id_model(features, labels):
         #("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=5)),
         #("SVC", LinearSVC(class_weight="balanced")),
         #("SVC", SVC(C=1, kernel='rbf')),
-        ("DecisionTree", RandomForestClassifier(n_estimators=20, min_samples_split=2, min_samples_leaf=1, class_weight=None)),
+        ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=6, min_samples_leaf=1, class_weight=None)),
     ])
 
     # Fit the complete pipeline
     # Test accuracy of model
-    # param_grid_union = {
-    #     "DecisionTree__min_samples_split": [2,4,6],
-    #     "DecisionTree__min_samples_leaf": [1,2,4],
-    #     "DecisionTree__n_estimators": [5, 10, 20],
-    #     }
+    param_grid_union = {
+        "DecisionTree__min_samples_split": [2,4,6,10],
+        "DecisionTree__min_samples_leaf": [1,2,4],
+        "DecisionTree__n_estimators": [5, 10, 20],
+        }
 
-    # grid_search_union = GridSearchCV(pipeline_union, param_grid=param_grid_union, cv=10)
-    #start = time()
-    #grid_search_union.fit(features, labels)
+    grid_search_union = GridSearchCV(pipeline_union, param_grid=param_grid_union, cv=10, scoring="f1")
+    start = time()
+    np.random.seed(42)
+    grid_search_union.fit(features, labels)
 
-    #print("GridSearchCV took %.2f seconds for %d candidate parameter settings." 
-    #    % (time() - start, len(grid_search_union.cv_results_['params'])))
-    #report(grid_search_union.cv_results_)
+    print("GridSearchCV took %.2f seconds for %d candidate parameter settings." 
+        % (time() - start, len(grid_search_union.cv_results_['params'])))
+    report(grid_search_union.cv_results_)
+
     np.random.seed(42)
     pred = cross_val_predict(pipeline_union, features, labels, cv=10)
     print confusion_matrix(labels, pred)
@@ -578,6 +580,33 @@ def prepare_data(data_dict, filename="data_dict.pkl", load=True):
 
 #dump_classifier_and_data(clf, my_dataset, features_list)
 
+def extract_labels_features(data, label_key = "poi"):
+    """ Function extracts labels and features arrays
+    for classifier from data
+
+    Parameters
+    ----------
+    data: dictionary of dictonaries including the key 
+          `label_key` defining the label of each dataset
+
+    Output
+    ------
+    labels, features: labels is a list of labels per data set,
+                      feature is a list of dictionaries with features
+                      for each data set.
+    """
+    features = []
+    labels = []
+    names = []
+    for key, value in data.items():
+        labels.append(value["poi"])
+        feature = value.copy()
+        feature.pop("poi",None)
+        features.append(feature)
+        names.append(key)
+    
+    return labels, features, names
+
 if __name__ =="__main__":
     ### Load the dictionary containing the dataset
 
@@ -611,15 +640,8 @@ if __name__ =="__main__":
         my_dataset = prepare_data(sample_to_use, load=True)
         #print my_dataset
         # Split label
-        features = []
-        labels = []
-        names = []
-        for key, value in my_dataset.items():
-            labels.append(value["poi"])
-            feature = value.copy()
-            feature.pop("poi",None)
-            features.append(feature)
-            names.append(key)
+        labels, features, _ = extract_labels_features(my_dataset)
+
         clf, features_list = build_poi_id_model(features, labels)
 
         # Dump classifier for later 
