@@ -430,26 +430,52 @@ def build_poi_id_model(features, labels):
     pipeline_union = Pipeline([
         ("union", FeatureUnion(
             transformer_list=[
-                #("email_text", pipeline_email_text),
+                ("email_text", pipeline_email_text),
                 ("subjects", pipeline_subjects),
-                #("financial", pipeline_financial),
+                ("financial", pipeline_financial),
                 ("email",pipeline_email),
-            ]
+            ],
+            transformer_weights={'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 0},
         )),
         ("Scale", StandardScaler()),
         #("Select", SelectKBest(score_func=f_classif, k=10)),
-        #("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=5)),
-        #("SVC", LinearSVC(class_weight="balanced")),
-        #("SVC", SVC(C=1, kernel='rbf')),
-        ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=6, min_samples_leaf=1, class_weight=None)),
+        # ("KNeighborsClassifier", KNeighborsClassifier()),
+        ("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=1, metric='manhattan', weights='uniform')),
+        # ("SVC", SVC(C=0.8, kernel='rbf')),
+        # ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=6, min_samples_leaf=1, class_weight=None)),
     ])
 
     # Fit the complete pipeline
     # Test accuracy of model
     param_grid_union = {
-        "DecisionTree__min_samples_split": [2,4,6,10],
-        "DecisionTree__min_samples_leaf": [1,2,4],
-        "DecisionTree__n_estimators": [5, 10, 20],
+        # "union__transformer_weights": [
+        #                                 {'email_text': 1, 'subjects': 1, 'financial': 1, 'email': 1},
+        #                                 {'email_text': 0, 'subjects': 1, 'financial': 1, 'email': 1},
+        #                                 {'email_text': 1, 'subjects': 0, 'financial': 1, 'email': 1},
+        #                                 {'email_text': 1, 'subjects': 1, 'financial': 0, 'email': 1},
+        #                                 {'email_text': 1, 'subjects': 1, 'financial': 1, 'email': 0},
+        #                                 {'email_text': 0, 'subjects': 0, 'financial': 1, 'email': 1},
+        #                                 {'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 1},
+        #                                 {'email_text': 0, 'subjects': 1, 'financial': 1, 'email': 0},
+        #                                 {'email_text': 1, 'subjects': 0, 'financial': 0, 'email': 1},
+        #                                 {'email_text': 1, 'subjects': 0, 'financial': 1, 'email': 0},
+        #                                 {'email_text': 1, 'subjects': 1, 'financial': 0, 'email': 0},
+        #                                 {'email_text': 0, 'subjects': 0, 'financial': 0, 'email': 1},
+        #                                 {'email_text': 0, 'subjects': 0, 'financial': 1, 'email': 0},
+        #                                 {'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 0},
+        #                                 {'email_text': 1, 'subjects': 0, 'financial': 0, 'email': 0},
+        #                               ],
+        # "DecisionTree__min_samples_split": [2,4,6,10],
+        # "DecisionTree__min_samples_leaf": [1,2,4],
+        # "DecisionTree__n_estimators": [5, 10, 20],
+        # "union__email_text__NaiveBayes__estimator__alpha": [.5, .8, 1],
+        #  "SVC__C": [.2, .5, .8, 1],
+        #  "SVC__kernel": ['rbf', 'sigmoid', 'linear'],
+        #  "SVC__class_weight": [None, 'balanced'],
+        #  "SVC__probability": [False, True],
+        "KNeighborsClassifier__n_neighbors": [1, 3, 5],
+        "KNeighborsClassifier__weights": ["uniform", "distance"],
+        "KNeighborsClassifier__metric": ["minkowski", "manhattan"]
         }
 
     grid_search_union = GridSearchCV(pipeline_union, param_grid=param_grid_union, cv=10, scoring="f1")
@@ -467,11 +493,11 @@ def build_poi_id_model(features, labels):
     print classification_report(labels, pred)
     print "Accuracy: ", accuracy_score(labels, pred)
 
-    # word_feature_names = SelectMatchFeatures(convert_to_numeric=True, feature_match="word_.*").fit(features).get_feature_names()
+    # Extract names of subject features
     sub_feature_names = SelectMatchFeatures(convert_to_numeric=True, feature_match="sub_.*").fit(features).get_feature_names()
+    features_list = sub_feature_names
 
-    features_list = FEATURES_EMAIL + sub_feature_names
-
+    # Return classifier and names of features used
     return pipeline_union, features_list
 
 def prepare_data(data_dict, filename="data_dict.pkl", load=True):
@@ -541,44 +567,6 @@ def prepare_data(data_dict, filename="data_dict.pkl", load=True):
     # Save data to file
     joblib.dump(data_dict, filename)
     return data_dict
-
-### Task 1: Select what features you'll use.
-### features_list is a list of strings, each of which is a feature name.
-### The first feature must be "poi".
-# was features_list = ['poi','salary'] # You will need to use more features
-
-### Task 2: Remove outliers
-
-### Task 3: Create new feature(s)
-
-### Store to my_dataset for easy export below.
-#my_dataset = data_dict
-
-### Extract features and labels from dataset for local testing
-#data = featureFormat(my_dataset, features_list, sort_keys=False, remove_all_zeroes=False)
-#labels, features = targetFeatureSplit(data)
-
-### Task 4: Try a varity of classifiers
-### Please name your classifier clf for easy export below.
-### Note that if you want to do PCA or other multi-stage operations,
-### you'll need to use Pipelines. For more info:
-### http://scikit-learn.org/stable/modules/pipeline.html
-
-### Task 5: Tune your classifier to achieve better than .3 precision and recall 
-### using our testing script. Check the tester.py script in the final project
-### folder for details on the evaluation method, especially the test_classifier
-### function. Because of the small size of the dataset, the script uses
-### stratified shuffle split cross validation. For more info: 
-### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
-
-# Example starting point. Try investigating other evaluation techniques!
-
-### Task 6: Dump your classifier, dataset, and features_list so anyone can
-### check your results. You do not need to change anything below, but make sure
-### that the version of poi_id.py that you submit can be run on its own and
-### generates the necessary .pkl files for validating your results.
-
-#dump_classifier_and_data(clf, my_dataset, features_list)
 
 def extract_labels_features(data, label_key = "poi"):
     """ Function extracts labels and features arrays
