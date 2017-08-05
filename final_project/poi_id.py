@@ -441,7 +441,7 @@ def build_poi_id_model(features, labels):
         #("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=5)),
         #("SVC", LinearSVC(class_weight="balanced")),
         #("SVC", SVC(C=1, kernel='rbf')),
-        ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=4, min_samples_leaf=1, class_weight=None)),
+        ("DecisionTree", RandomForestClassifier(n_estimators=20, min_samples_split=2, min_samples_leaf=1, class_weight=None)),
     ])
 
     # Fit the complete pipeline
@@ -616,10 +616,11 @@ if __name__ =="__main__":
         names = []
         for key, value in my_dataset.items():
             labels.append(value["poi"])
-            value.pop("poi",None)
-            features.append(value)
+            feature = value.copy()
+            feature.pop("poi",None)
+            features.append(feature)
             names.append(key)
         clf, features_list = build_poi_id_model(features, labels)
 
         # Dump classifier for later 
-        dump_classifier_and_data(clf, my_dataset, features_list)
+        dump_classifier_and_data(clf, my_dataset, ["poi"] + features_list)
