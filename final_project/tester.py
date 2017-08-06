@@ -106,6 +106,6 @@ def main():
 
 if __name__ == '__main__':
     # Import functions to be able to pickle load classifier
-    from poi_id import SelectMatchFeatures, SelectFeatureList, log_trans
+    from poi_id import SelectMatchFeatures, SelectFeatureList, log_trans, ImputeOrZero
 
     main()
