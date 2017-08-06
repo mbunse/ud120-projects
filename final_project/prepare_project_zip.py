@@ -4,7 +4,8 @@ from os import system
 
 def export_notebook():
     """ Function to export jupyter notebook as HTML file """
-    system("jupyter nbconvert --to HTML \"Look At Enron data set.ipynb\"")
+    #system("jupyter nbconvert --to HTML \"Look At Enron data set.ipynb\"")
+    system("jupyter nbconvert --to HTML --output=Look+At+Enron+data+set.html \"Look At Enron data set.ipynb\"")
     return
 
 def zip_files():
