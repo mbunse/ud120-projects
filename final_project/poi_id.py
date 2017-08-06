@@ -543,10 +543,9 @@ def build_poi_id_model(features, labels):
     pipeline_email_text = Pipeline([
         ("GetEmailText", SelectMatchFeatures(feature_match="word_.*")),
         #("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=10)),
-        #("SelectPercentile", SelectKBest(score_func=f_classif, k=20)),
+        ("SelectPercentile", SelectKBest(score_func=f_classif, k=20)),
         #("SVC", SelectFromModel(LinearSVC(class_weight="balanced", C=0.7), threshold=0.25)),
-        #("NaiveBayes", SelectFromModel(MultinomialNB(alpha=1, fit_prior=False), threshold=0.5)),
-        #("NaiveBayes", MultinomialNBTransformer(alpha=1, fit_prior=False)),
+        ("NaiveBayes", SelectFromModel(MultinomialNB(alpha=1, fit_prior=False), threshold=0.5)),
         #("Scale", StandardScaler()),
     ])
 
@@ -619,7 +618,7 @@ def build_poi_id_model(features, labels):
                                        {'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 0},
                                        {'email_text': 1, 'subjects': 0, 'financial': 0, 'email': 0},
                                       ],
-        "union__email_text__SelectPercentile__k": [10, 20, 50, 100]
+        "union__email_text__SelectPercentile__k": [10, 20, 50, 100],
         "union__subjects__SelectPercentile__k": [2, 3, 5, 10, 100],
         # "union__financial__Impute__strategy": ["median", "zero"],
         # "DecisionTree__min_samples_split": [2,4,6,10],
