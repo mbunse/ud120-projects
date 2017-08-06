@@ -1,5 +1,11 @@
 """ Helper module for project submission """
 from zipfile import ZipFile
+from os import system
+
+def export_notebook():
+    """ Function to export jupyter notebook as HTML file """
+    system("jupyter nbconvert --to HTML \"Look At Enron data set.ipynb\"")
+    return
 
 def zip_files():
     """ Function to zip files for project
@@ -12,6 +18,8 @@ def zip_files():
                       "tester.py",
                       "Look+At+Enron+data+set.html",
                       "Look At Enron data set.ipynb",
+                      "data_dict.pkl",
+                      "final_project_dataset.pkl",
                      ]
     for filename in files_to_write:
         zipper.write(filename)
@@ -19,9 +27,10 @@ def zip_files():
     zipper.close()
 
 if __name__ == "__main__":
+    export_notebook()
     zip_files()
 
-    text = """I compiled a Jupyter notebook included in the zip file. The git repo can be found here: https://github.com/mbunse/ud120-projects
+    TEXT = """I compiled a Jupyter notebook included in the zip file. The git repo can be found here: https://github.com/mbunse/ud120-projects
 
 I had to modify the tester.py module to work with the data set. (As some feature selection steps are included in the classifier the feature vector has to be formatted as dictionary which is not supported by the original version of this module). I included an updated version of this module in the archive. """
-    print text
+    print TEXT
