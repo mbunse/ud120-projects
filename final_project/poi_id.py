@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split, cross_val_score,  \
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectFromModel, SelectPercentile, \
-    SelectKBest, f_classif
+    SelectKBest, f_classif, chi2
 from sklearn.externals import joblib
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
@@ -526,7 +526,6 @@ def build_poi_id_model(features, labels):
                          stratify=labels
                         )
 
-
     # Setting for persistance
     # In the persistance run, texts from emails are extracted for
     # training and testing data sets and the results are persisted
@@ -543,17 +542,16 @@ def build_poi_id_model(features, labels):
     pipeline_email_text = Pipeline([
         ("GetEmailText", SelectMatchFeatures(feature_match="word_.*")),
         #("SelectPercentile", SelectPercentile(score_func=f_classif, percentile=10)),
-        ("SelectPercentile", SelectKBest(score_func=f_classif, k=20)),
+        ("SelectPercentile", SelectKBest(score_func=chi2, k=250)),
         #("SVC", SelectFromModel(LinearSVC(class_weight="balanced", C=0.7), threshold=0.25)),
-        ("NaiveBayes", SelectFromModel(MultinomialNB(alpha=1, fit_prior=False), threshold=0.5)),
+        # ("NaiveBayes", SelectFromModel(MultinomialNB(alpha=.5, fit_prior=False), threshold=0.5)),
         #("Scale", StandardScaler()),
     ])
 
     pipeline_subjects = Pipeline([
         ("GetEmailText", SelectMatchFeatures(feature_match="sub_.*")),
-        ("SelectPercentile", SelectKBest(score_func=f_classif, k=3)),
-        #("NaiveBayes", SelectFromModel(MultinomialNB(alpha=1, fit_prior=False))),
-        #("NaiveBayes", MultinomialNBTransformer(alpha=1, fit_prior=False)),
+        ("SelectPercentile", SelectKBest(score_func=chi2, k=100)),
+        # ("NaiveBayes", SelectFromModel(MultinomialNB(alpha=1, fit_prior=False))),
         #("Scale", StandardScaler())
     ])
     # Process financial features
@@ -588,43 +586,48 @@ def build_poi_id_model(features, labels):
                 ("financial", pipeline_financial),
                 ("email",pipeline_email),
             ],
-            transformer_weights={'email_text': 0, 'subjects': 1, 'financial': 1, 'email': 1},
+            #transformer_weights={'email_text': 0, 'subjects': 1, 'financial': 1, 'email': 1},
         )),
         ("Scale", StandardScaler()),
         #("Select", SelectKBest(score_func=f_classif, k=10)),
         # ("KNeighborsClassifier", KNeighborsClassifier()),
         ("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=1, metric='minkowski', weights='distance')),
-        # ("SVC", SVC(C=0.8, kernel='rbf')),
-        # ("DecisionTree", RandomForestClassifier()),
-        # ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=6, min_samples_leaf=1, class_weight=None)),
+        # ("SVC", SVC(class_weight='balanced')),
+        #  ("SVC", SVC(C=0.8, kernel='rbf', class_weight='balanced')),
+        #  ("DecisionTree", RandomForestClassifier()),
+        #("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=6, min_samples_leaf=1, class_weight=None)),
+        #("NaiveBayes", MultinomialNB(alpha=1, fit_prior=False)),
     ])
 
     # Fit the complete pipeline
     # Test accuracy of model
     param_grid_union = {
-        "union__transformer_weights": [{'email_text': 1, 'subjects': 1, 'financial': 1, 'email': 1},
-                                       {'email_text': 0, 'subjects': 1, 'financial': 1, 'email': 1},
-                                       {'email_text': 1, 'subjects': 0, 'financial': 1, 'email': 1},
-                                       {'email_text': 1, 'subjects': 1, 'financial': 0, 'email': 1},
-                                       {'email_text': 1, 'subjects': 1, 'financial': 1, 'email': 0},
-                                       {'email_text': 0, 'subjects': 0, 'financial': 1, 'email': 1},
+        "union__transformer_weights": [
+                                    #    {'email_text': 1, 'subjects': 1, 'financial': 1, 'email': 1},
+                                    #    {'email_text': 0, 'subjects': 1, 'financial': 1, 'email': 1},
+                                    #    {'email_text': 1, 'subjects': 0, 'financial': 1, 'email': 1},
+                                    #    {'email_text': 1, 'subjects': 1, 'financial': 0, 'email': 1},
+                                    #    {'email_text': 1, 'subjects': 1, 'financial': 1, 'email': 0},
+                                    #    {'email_text': 0, 'subjects': 0, 'financial': 1, 'email': 1},
                                        {'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 1},
-                                       {'email_text': 0, 'subjects': 1, 'financial': 1, 'email': 0},
-                                       {'email_text': 1, 'subjects': 0, 'financial': 0, 'email': 1},
-                                       {'email_text': 1, 'subjects': 0, 'financial': 1, 'email': 0},
-                                       {'email_text': 1, 'subjects': 1, 'financial': 0, 'email': 0},
-                                       {'email_text': 0, 'subjects': 0, 'financial': 0, 'email': 1},
-                                       {'email_text': 0, 'subjects': 0, 'financial': 1, 'email': 0},
-                                       {'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 0},
-                                       {'email_text': 1, 'subjects': 0, 'financial': 0, 'email': 0},
+                                    #    {'email_text': 0, 'subjects': 1, 'financial': 1, 'email': 0},
+                                    #    {'email_text': 1, 'subjects': 0, 'financial': 0, 'email': 1},
+                                    #    {'email_text': 1, 'subjects': 0, 'financial': 1, 'email': 0},
+                                    #    {'email_text': 1, 'subjects': 1, 'financial': 0, 'email': 0},
+                                    #    {'email_text': 0, 'subjects': 0, 'financial': 0, 'email': 1},
+                                    #    {'email_text': 0, 'subjects': 0, 'financial': 1, 'email': 0},
+                                    #    {'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 0},
+                                    #    {'email_text': 1, 'subjects': 0, 'financial': 0, 'email': 0},
                                       ],
-        "union__email_text__SelectPercentile__k": [10, 20, 50, 100],
-        "union__subjects__SelectPercentile__k": [2, 3, 5, 10, 100],
+        # "union__email_text__SelectPercentile__k": [10, 50, 100, 250, 500],
+        # "union__email_text__SelectPercentile__score_func": [chi2, f_classif],
+        # "union__subjects__SelectPercentile__k": [2, 3, 5, 10, 100, 200],
+        # "union__subjects__SelectPercentile__score_func": [chi2, f_classif],
         # "union__financial__Impute__strategy": ["median", "zero"],
-        # "DecisionTree__min_samples_split": [2,4,6,10],
+        # "DecisionTree__min_samples_split": [2,4,6],
         # "DecisionTree__min_samples_leaf": [1,2,4],
         # "DecisionTree__n_estimators": [5, 10, 20],
-        "union__email_text__NaiveBayes__estimator__alpha": [.5, .8, 1],
+        # "NaiveBayes__alpha": [.5, .8, 1],
         #  "SVC__C": [.2, .5, .8, 1],
         #  "SVC__kernel": ['rbf', 'sigmoid', 'linear'],
         #  "SVC__class_weight": [None, 'balanced'],
@@ -643,7 +646,12 @@ def build_poi_id_model(features, labels):
         % (time() - start, len(grid_search_union.cv_results_['params'])))
     report(grid_search_union.cv_results_)
 
+
     np.random.seed(42)
+    best_est = np.flatnonzero(grid_search_union.cv_results_['rank_test_score'] == 1)[0]
+    print grid_search_union.cv_results_['params'][best_est]
+    pipeline_union.set_params(**grid_search_union.cv_results_['params'][best_est])
+
     pred = cross_val_predict(pipeline_union, features, labels, cv=10)
     print confusion_matrix(labels, pred)
     print classification_report(labels, pred)
