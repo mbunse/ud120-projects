@@ -21,6 +21,7 @@ def zip_files():
                       "Look At Enron data set.ipynb",
                       "data_dict.pkl",
                       "final_project_dataset.pkl",
+                      "img/Flow chart feature selection.png"
                      ]
     for filename in files_to_write:
         zipper.write(filename)

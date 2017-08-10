@@ -482,6 +482,31 @@ class ImputeOrZero(Imputer):
     def fit_transform(self, X, y):
         return self.fit(X, y).transform(X)
 
+class VectorToDict(BaseEstimator, TransformerMixin):
+    """
+    Transformer class to transfrom vector back to List of dictionaries 
+    """
+    def __init__(self, feature_names, dataset_names):
+        self.feature_names = feature_names
+        self.dataset_names = dataset_names
+    
+    def fit(self, x, y=None):
+        self.poi = y
+        return self
+
+    def transform(self, x):
+        data_dict = {}
+        for data_idx, feature_set in enumerate(x):
+            new_dict = {}
+            for feat_idx, feature in enumerate(feature_set):
+                if np.isnan(feature):
+                    feature = "NaN"
+                new_dict[self.feature_names[feat_idx]] = feature
+            new_dict["poi"] = self.poi[data_idx]
+            data_dict[self.dataset_names[data_idx]] = new_dict
+
+        return data_dict
+
 def report(results, n_top=3):
     """
     Utility function to report best scores
@@ -503,7 +528,7 @@ def log_trans(x):
     lambda function can be pickeled """
     return np.log1p(np.abs(x))
 
-def build_poi_id_model(features, labels):
+def build_poi_id_model(features, labels, names):
     """
     Function to train classifier to predict labels given features
 
@@ -576,10 +601,8 @@ def build_poi_id_model(features, labels):
         ("Log1P", FunctionTransformer(func=log_trans)),
     ])
 
-    # Combine email text features and other features
-    # then run classifier on these features
-    pipeline_union = Pipeline([
-        ("union", FeatureUnion(
+
+    feature_union = FeatureUnion(
             transformer_list=[
                 ("email_text", pipeline_email_text),
                 ("subjects", pipeline_subjects),
@@ -587,7 +610,11 @@ def build_poi_id_model(features, labels):
                 ("email",pipeline_email),
             ],
             #transformer_weights={'email_text': 0, 'subjects': 1, 'financial': 1, 'email': 1},
-        )),
+            )
+    # Combine email text features and other features
+    # then run classifier on these features
+    pipeline_union = Pipeline([
+        ("union", feature_union),
         ("Scale", StandardScaler()),
         #("Select", SelectKBest(score_func=f_classif, k=10)),
         # ("KNeighborsClassifier", KNeighborsClassifier()),
@@ -595,7 +622,7 @@ def build_poi_id_model(features, labels):
         # ("SVC", SVC(class_weight='balanced')),
         #  ("SVC", SVC(C=0.8, kernel='rbf', class_weight='balanced')),
         #  ("DecisionTree", RandomForestClassifier()),
-        #("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=6, min_samples_leaf=1, class_weight=None)),
+        # ("DecisionTree", RandomForestClassifier(n_estimators=10, min_samples_split=6, min_samples_leaf=1, class_weight=None)),
         #("NaiveBayes", MultinomialNB(alpha=1, fit_prior=False)),
     ])
 
@@ -609,14 +636,14 @@ def build_poi_id_model(features, labels):
                                     #    {'email_text': 1, 'subjects': 1, 'financial': 0, 'email': 1},
                                     #    {'email_text': 1, 'subjects': 1, 'financial': 1, 'email': 0},
                                     #    {'email_text': 0, 'subjects': 0, 'financial': 1, 'email': 1},
-                                       {'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 1},
+                                    #    {'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 1},
                                     #    {'email_text': 0, 'subjects': 1, 'financial': 1, 'email': 0},
                                     #    {'email_text': 1, 'subjects': 0, 'financial': 0, 'email': 1},
                                     #    {'email_text': 1, 'subjects': 0, 'financial': 1, 'email': 0},
                                     #    {'email_text': 1, 'subjects': 1, 'financial': 0, 'email': 0},
                                     #    {'email_text': 0, 'subjects': 0, 'financial': 0, 'email': 1},
                                     #    {'email_text': 0, 'subjects': 0, 'financial': 1, 'email': 0},
-                                    #    {'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 0},
+                                       {'email_text': 0, 'subjects': 1, 'financial': 0, 'email': 0},
                                     #    {'email_text': 1, 'subjects': 0, 'financial': 0, 'email': 0},
                                       ],
         # "union__email_text__SelectPercentile__k": [10, 50, 100, 250, 500],
@@ -646,7 +673,6 @@ def build_poi_id_model(features, labels):
         % (time() - start, len(grid_search_union.cv_results_['params'])))
     report(grid_search_union.cv_results_)
 
-
     np.random.seed(42)
     best_est = np.flatnonzero(grid_search_union.cv_results_['rank_test_score'] == 1)[0]
     print grid_search_union.cv_results_['params'][best_est]
@@ -657,12 +683,25 @@ def build_poi_id_model(features, labels):
     print classification_report(labels, pred)
     print "Accuracy: ", accuracy_score(labels, pred)
 
-    # Extract names of subject features
-    sub_feature_names = SelectMatchFeatures(convert_to_numeric=True, feature_match="sub_.*").fit(features).get_feature_names()
-    features_list = sub_feature_names
+    pickle.dump(pipeline_union, open("full_classifier.pkl", "w"))
 
-    # Return classifier and names of features used
-    return pipeline_union, features_list
+    # Pepare data for tester
+    feature_select = FeatureUnion(transformer_list=[("subjects", pipeline_subjects)])
+    feature_transformed = feature_select.fit_transform(features, labels)
+    # extract names of subject features
+    sub_features = feature_select.transformer_list[0][1].named_steps["GetEmailText"].get_feature_names()
+    select_sub_features_idx = feature_select.transformer_list[0][1].named_steps["SelectPercentile"].get_support(indices=True)
+    select_sub_features =  np.take(sub_features, select_sub_features_idx).tolist()
+
+    data_dict =  VectorToDict(feature_names=select_sub_features, dataset_names=names).fit_transform(feature_transformed, labels)
+
+    # Prepare classifier for tester
+    clf = Pipeline([
+        ("Scale", StandardScaler()),
+        ("KNeighborsClassifier", KNeighborsClassifier(n_neighbors=3, metric="manhattan", weights="distance")),
+    ])
+    # Return classifier, names of features used and data
+    return clf, select_sub_features, data_dict
 
 def prepare_data(data_dict, filename="data_dict.pkl", load=True):
     """ 
@@ -790,11 +829,13 @@ if __name__ =="__main__":
             sample_to_use = data_dict
 
         my_dataset = prepare_data(sample_to_use, load=True)
+
+        pickle.dump(my_dataset, open("full_dataset.pkl", "w"))
         #print my_dataset
         # Split label
-        labels, features, _ = extract_labels_features(my_dataset)
+        labels, features, names = extract_labels_features(my_dataset)
 
-        clf, features_list = build_poi_id_model(features, labels)
+        clf, features_list, data_dict = build_poi_id_model(features, labels, names)
 
         # Dump classifier for later 
-        dump_classifier_and_data(clf, my_dataset, ["poi"] + features_list)
+        dump_classifier_and_data(clf, data_dict, ["poi"] + features_list)

@@ -19,7 +19,7 @@ Recall: {:>0.{display_precision}f}\tF1: {:>0.{display_precision}f}\tF2: {:>0.{di
 RESULTS_FORMAT_STRING = "\tTotal predictions: {:4d}\tTrue positives: {:4d}\tFalse positives: {:4d}\
 \tFalse negatives: {:4d}\tTrue negatives: {:4d}"
 
-def test_classifier(clf, dataset, feature_list, folds = 1000):
+def test_classifier(clf, dataset, folds = 1000):
     from sklearn.model_selection import StratifiedShuffleSplit
     #from sklearn.cross_validation import StratifiedShuffleSplit as StratifiedShuffleSplit_deprecated
     #StratifiedShuffleSplit_deprecated(labels, )
@@ -77,32 +77,21 @@ def test_classifier(clf, dataset, feature_list, folds = 1000):
         print "Got a divide by zero when trying out:", clf
         print "Precision or recall may be undefined due to a lack of true positive predicitons."
 
-CLF_PICKLE_FILENAME = "my_classifier.pkl"
-DATASET_PICKLE_FILENAME = "my_dataset.pkl"
-FEATURE_LIST_FILENAME = "my_feature_list.pkl"
-
-def dump_classifier_and_data(clf, dataset, feature_list):
-    with open(CLF_PICKLE_FILENAME, "w") as clf_outfile:
-        pickle.dump(clf, clf_outfile)
-    with open(DATASET_PICKLE_FILENAME, "w") as dataset_outfile:
-        pickle.dump(dataset, dataset_outfile)
-    with open(FEATURE_LIST_FILENAME, "w") as featurelist_outfile:
-        pickle.dump(feature_list, featurelist_outfile)
+CLF_PICKLE_FILENAME = "full_classifier.pkl"
+DATASET_PICKLE_FILENAME = "full_dataset.pkl"
 
 def load_classifier_and_data():
     with open(CLF_PICKLE_FILENAME, "r") as clf_infile:
         clf = pickle.load(clf_infile)
     with open(DATASET_PICKLE_FILENAME, "r") as dataset_infile:
         dataset = pickle.load(dataset_infile)
-    with open(FEATURE_LIST_FILENAME, "r") as featurelist_infile:
-        feature_list = pickle.load(featurelist_infile)
-    return clf, dataset, feature_list
+    return clf, dataset
 
 def main():
     ### load up student's classifier, dataset, and feature_list
-    clf, dataset, feature_list = load_classifier_and_data()
+    clf, dataset = load_classifier_and_data()
     ### Run testing script
-    test_classifier(clf, dataset, feature_list)
+    test_classifier(clf, dataset)
 
 if __name__ == '__main__':
     # Import functions to be able to pickle load classifier

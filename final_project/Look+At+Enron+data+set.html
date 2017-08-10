@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>Look At Enron data set</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>Look At Enron data set</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <style type="text/css">
@@ -11,8 +13,8 @@
 *
 */
 /*!
- * Bootstrap v3.3.7 (http://getbootstrap.com)
- * Copyright 2011-2016 Twitter, Inc.
+ * Bootstrap v3.3.6 (http://getbootstrap.com)
+ * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
@@ -1107,6 +1109,7 @@ a:focus {
   text-decoration: underline;
 }
 a:focus {
+  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
@@ -2535,6 +2538,7 @@ select[size] {
 input[type="file"]:focus,
 input[type="radio"]:focus,
 input[type="checkbox"]:focus {
+  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
@@ -3025,6 +3029,7 @@ select[multiple].input-lg {
 .btn.focus,
 .btn:active.focus,
 .btn.active.focus {
+  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
@@ -8755,9 +8760,6 @@ body > #header .header-bar {
     margin-left: 10px;
   }
 }
-[dir="rtl"] #ipython_notebook {
-  float: right !important;
-}
 #noscript {
   width: auto;
   padding-top: 16px;
@@ -8960,14 +8962,8 @@ span#login_widget > .button .badge,
  *
  * Author: Jupyter Development Team
  */
-[dir="rtl"] #tabs li {
-  float: right;
-}
 ul#tabs {
   margin-bottom: 4px;
-}
-[dir="rtl"] ul#tabs {
-  margin-right: 0px;
 }
 ul#tabs a {
   padding-top: 6px;
@@ -8990,16 +8986,6 @@ ul.breadcrumb span {
 }
 .list_toolbar .tree-buttons {
   padding-top: 1px;
-}
-[dir="rtl"] .list_toolbar .tree-buttons {
-  float: left !important;
-}
-[dir="rtl"] .list_toolbar .pull-right {
-  padding-top: 1px;
-  float: left !important;
-}
-[dir="rtl"] .list_toolbar .pull-left {
-  float: right !important;
 }
 .dynamic-buttons {
   padding-top: 3px;
@@ -9136,9 +9122,6 @@ ul.breadcrumb span {
 #tree-selector {
   padding-right: 0px;
 }
-[dir="rtl"] #tree-selector a {
-  float: right;
-}
 #button-select-all {
   min-width: 50px;
 }
@@ -9228,9 +9211,6 @@ ul#new-menu {
   left: auto;
   right: 0;
 }
-[dir="rtl"] #new-menu {
-  text-align: right;
-}
 .kernel-menu-icon {
   padding-right: 12px;
   width: 24px;
@@ -9275,9 +9255,6 @@ ul#new-menu {
 }
 #running .panel-group .panel .panel-body .list_container .list_item:last-child {
   border-bottom: 0px;
-}
-[dir="rtl"] #running .col-sm-8 {
-  float: right !important;
 }
 .delete-button {
   display: none;
@@ -9574,7 +9551,6 @@ div.cell.selected.jupyter-soft-selected {
   }
 }
 div.inner_cell {
-  min-width: 0;
   /* Old browsers */
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -9595,6 +9571,11 @@ div.inner_cell {
   box-flex: 1;
   /* Modern browsers */
   flex: 1;
+}
+@-moz-document url-prefix() {
+  div.inner_cell {
+    overflow-x: hidden;
+  }
 }
 /* input_area and input_prompt must match in top border and margin for alignment */
 div.input_area {
@@ -11265,7 +11246,7 @@ div#pager .ui-resizable-handle::after {
 }
 .shortcut_key {
   display: inline-block;
-  width: 21ex;
+  width: 20ex;
   text-align: right;
   font-family: monospace;
 }
@@ -11577,7 +11558,6 @@ ul.typeahead-list > li > a {
   box-shadow: 0px 0px 12px 1px rgba(87, 87, 87, 0.2);
 }
 .terminal-app .terminal {
-  width: 100%;
   float: left;
   font-family: monospace;
   color: white;
@@ -11591,9 +11571,6 @@ ul.typeahead-list > li > a {
 .terminal-app .terminal dummy-screen {
   line-height: 1em;
   font-size: 14px;
-}
-.terminal-app .terminal .xterm-rows {
-  padding: 10px;
 }
 .terminal-app .terminal-cursor {
   color: black;
@@ -11654,10 +11631,8 @@ ul.typeahead-list > li > a {
 .highlight .mh { color: #666666 } /* Literal.Number.Hex */
 .highlight .mi { color: #666666 } /* Literal.Number.Integer */
 .highlight .mo { color: #666666 } /* Literal.Number.Oct */
-.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
 .highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
 .highlight .sc { color: #BA2121 } /* Literal.String.Char */
-.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
 .highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
 .highlight .s2 { color: #BA2121 } /* Literal.String.Double */
 .highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
@@ -11668,11 +11643,9 @@ ul.typeahead-list > li > a {
 .highlight .s1 { color: #BA2121 } /* Literal.String.Single */
 .highlight .ss { color: #19177C } /* Literal.String.Symbol */
 .highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
-.highlight .fm { color: #0000FF } /* Name.Function.Magic */
 .highlight .vc { color: #19177C } /* Name.Variable.Class */
 .highlight .vg { color: #19177C } /* Name.Variable.Global */
 .highlight .vi { color: #19177C } /* Name.Variable.Instance */
-.highlight .vm { color: #19177C } /* Name.Variable.Magic */
 .highlight .il { color: #666666 } /* Literal.Number.Integer.Long */
     </style>
 <style type="text/css">
@@ -11726,7 +11699,9 @@ body {
 div#notebook {
   overflow: visible;
   border-top: none;
-}@media print {
+}
+
+@media print {
   div.cell {
     display: block;
     page-break-inside: avoid;
@@ -11747,7 +11722,7 @@ div#notebook {
 
 <!-- Loading mathjax macro -->
 <!-- Load mathjax -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
     <!-- MathJax configuration -->
     <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -11771,19 +11746,21 @@ div#notebook {
   <div tabindex="-1" id="notebook" class="border-box-sizing">
     <div class="container" id="notebook-container">
 
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Look-at-Enron-data-set">Look at Enron data set<a class="anchor-link" href="#Look-at-Enron-data-set">&#194;&#182;</a></h1>
+<h1 id="Look-at-Enron-data-set">Look at Enron data set<a class="anchor-link" href="#Look-at-Enron-data-set">&#182;</a></h1>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Loading-data">Loading data<a class="anchor-link" href="#Loading-data">&#194;&#182;</a></h2><p>I load the original data. The data is provided as a dictionary. The keys are the names of the Enron employees.</p>
+<h2 id="Loading-data">Loading data<a class="anchor-link" href="#Loading-data">&#182;</a></h2><p>I load the original data. The data is provided as a dictionary. The keys are the names of the Enron employees.</p>
 
 </div>
 </div>
@@ -11819,11 +11796,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[1]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[1]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -11845,11 +11818,12 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Basic-data-features">Basic data features<a class="anchor-link" href="#Basic-data-features">&#194;&#182;</a></h2><p>Number of samples:</p>
+<h2 id="Basic-data-features">Basic data features<a class="anchor-link" href="#Basic-data-features">&#182;</a></h2><p>Number of samples:</p>
 
 </div>
 </div>
@@ -11870,11 +11844,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[2]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[2]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -11887,7 +11857,8 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -11912,11 +11883,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[3]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[3]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -11929,7 +11896,8 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -11968,11 +11936,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[4]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[4]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -12104,7 +12068,8 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12137,11 +12102,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[5]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[5]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -12253,7 +12214,17 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Data-cleaning">Data cleaning<a class="anchor-link" href="#Data-cleaning">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12262,7 +12233,8 @@ div#notebook {
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12284,7 +12256,8 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12318,11 +12291,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[7]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[7]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -12335,7 +12304,8 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12360,11 +12330,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[8]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[8]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -12377,7 +12343,8 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12402,11 +12369,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[9]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[9]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -12419,7 +12382,8 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12444,11 +12408,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[10]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[10]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -12461,27 +12421,54 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Feature-Enrichment">Feature Enrichment<a class="anchor-link" href="#Feature-Enrichment">&#194;&#182;</a></h1><p>Since for the selected subset Enron emails are available, the according emails are processed.</p>
-<p>At first, all words from emails from a given person are vectorized using the term-frequency times inverse document-frequency method after quoted emails are removed using regular expressions.</p>
-<p>Then, all subjects from emails from and to a given employee are vectorized in the same way.</p>
-<p>The maximum document frequency is set to 30% and the maximum number of features is set to 500 for words in emails and 100 for subjects to reduce the number of features to handable size. Feature selection methods are not valid in this stage, since I do not split our data to train vectorizers in training and test sets. Word and subject features are simply selected by the number of occurrences.</p>
+<h3 id="Outlier-removal">Outlier removal<a class="anchor-link" href="#Outlier-removal">&#182;</a></h3><p>There is a "TOTAL" data set in the data set which would have to be removed. Since there are no emails for "TOTAL" this data set is already removed by the previous selection criteria.</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Final-set-of-features">Final set of features<a class="anchor-link" href="#Final-set-of-features">&#194;&#182;</a></h2>
+<h1 id="Feature-Enrichment">Feature Enrichment<a class="anchor-link" href="#Feature-Enrichment">&#182;</a></h1><p>Since for the selected subset Enron emails are available, the according emails are processed.</p>
+<h2 id="Email-text-bag-of-words-features">Email text bag-of-words features<a class="anchor-link" href="#Email-text-bag-of-words-features">&#182;</a></h2><p>As it has been shown during the course, words in Emails can give a hint about the author of the respective email. I want to test, whether bag of words features are capable to discriminate between POIs and non-POIs.</p>
+<p>At first, all words from emails from a given person are vectorized using the term-frequency times inverse document-frequency method after quoted emails are removed using regular expressions.</p>
+<p>The maximum document frequency is set to 30% and the maximum number of features is set to 500 to reduce the number of features to handable size.</p>
+<h2 id="Subject-features">Subject features<a class="anchor-link" href="#Subject-features">&#182;</a></h2><p>Subject lines of emails sent or received by employees might also give a hint about their involvement in the Enron fraud case. Involved persons might have exchanged according mails.</p>
+<p>To construct features from the subject lines, prefixes like "Re:" or "Fwd:" are stripped from subject lines.
+Then, all subjects from emails from and to a given employee are vectorized separatly, such, that for a feature for each subject line is created.</p>
+<p>The maximum document frequency is set to 30% and the maximum number of features is set to 100 to reduce the number of features to handable size.</p>
+
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Set-of-features-before-training">Set of features before training<a class="anchor-link" href="#Set-of-features-before-training">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The classifier will include feature selection steps that are trained on the training sample. The finally selected feature set can only be given after the training of the model. In this section all features used as input to the training of the classifier are given.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12509,11 +12496,15 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area">
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>C:\Users\Moritz\Anaconda3\envs\Udacity_ML_mini 1\lib\site-packages\sklearn\cross_validation.py:44: DeprecationWarning: This module was deprecated in version 0.18 in favor of the model_selection module into which all the refactored classes and functions are moved. Also note that the interface of the new CV iterators are different from that of this module. This module will be removed in 0.20.
+  &#34;This module will be removed in 0.20.&#34;, DeprecationWarning)
+</pre>
+</div>
+</div>
 
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Number of financial features used: 9
 Names of  financial features used:
@@ -12521,11 +12512,7 @@ Names of  financial features used:
 </div>
 </div>
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[11]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[11]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -12546,7 +12533,8 @@ Names of  financial features used:
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12561,6 +12549,8 @@ Names of  financial features used:
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">poi_id</span> <span class="kn">import</span> <span class="n">FEATURES_EMAIL</span>
+<span class="k">print</span> <span class="s2">&quot;Number of email count features used:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">FEATURES_EMAIL</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;Names of  email count features used:&quot;</span>
 <span class="n">FEATURES_EMAIL</span>
 </pre></div>
 
@@ -12572,11 +12562,15 @@ Names of  financial features used:
 <div class="output">
 
 
-<div class="output_area">
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Number of email count features used: 5
+Names of  email count features used:
+</pre>
+</div>
+</div>
 
-<div class="prompt output_prompt">Out[12]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[12]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -12593,7 +12587,8 @@ Names of  financial features used:
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12646,11 +12641,7 @@ Names of  financial features used:
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Number of word features: 500
 10 random word features
@@ -12663,7 +12654,8 @@ Names of  financial features used:
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12692,11 +12684,7 @@ Names of  financial features used:
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Number of subjects from features: 100
 10 random subjects from features
@@ -12709,7 +12697,8 @@ Names of  financial features used:
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12738,11 +12727,7 @@ Names of  financial features used:
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Number of subjects to features: 100
 10 random subjects to features
@@ -12755,7 +12740,8 @@ Names of  financial features used:
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12780,11 +12766,7 @@ Names of  financial features used:
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[17]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[17]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -12797,15 +12779,27 @@ Names of  financial features used:
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Feature-overview">Feature overview<a class="anchor-link" href="#Feature-overview">&#194;&#182;</a></h2>
+<p>In total, there are 714 features taken as input to the training.</p>
+
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Feature-overview">Feature overview<a class="anchor-link" href="#Feature-overview">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -12852,34 +12846,26 @@ Names of  financial features used:
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 
 <div class="output_html rendered_html output_subarea ">
 
     <div class="bk-root">
         <a href="http://bokeh.pydata.org" target="_blank" class="bk-logo bk-logo-small bk-logo-notebook"></a>
-        <span id="8fcc6a92-8880-4474-97b7-83964d06643b">Loading BokehJS ...</span>
+        <span id="45af5007-7732-4a90-aecf-31eb952a512a">Loading BokehJS ...</span>
     </div>
 </div>
 
 </div>
 
-<div class="output_area">
-
-<div class="prompt"></div>
+<div class="output_area"><div class="prompt"></div>
 
 
 
-
-
-<div id="f69019dc-5d16-4912-99ca-53de9efd3615"></div>
+<div id="5edb71db-9705-481c-9974-1cd476681838"></div>
 <div class="output_subarea output_javascript ">
 <script type="text/javascript">
-var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
+var element = $('#5edb71db-9705-481c-9974-1cd476681838');
 
 (function(global) {
   function now() {
@@ -12918,7 +12904,7 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
 
   function display_loaded() {
     if (window.Bokeh !== undefined) {
-      var el = document.getElementById("8fcc6a92-8880-4474-97b7-83964d06643b");
+      var el = document.getElementById("45af5007-7732-4a90-aecf-31eb952a512a");
       el.textContent = "BokehJS " + Bokeh.version + " successfully loaded.";
     } else if (Date.now() < window._bokeh_timeout) {
       setTimeout(display_loaded, 100)
@@ -12965,9 +12951,9 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
       console.log("Bokeh: injecting script tag for BokehJS library: ", url);
       document.getElementsByTagName("head")[0].appendChild(s);
     }
-  };var element = document.getElementById("8fcc6a92-8880-4474-97b7-83964d06643b");
+  };var element = document.getElementById("45af5007-7732-4a90-aecf-31eb952a512a");
   if (element == null) {
-    console.log("Bokeh: ERROR: autoload.js configured with elementid '8fcc6a92-8880-4474-97b7-83964d06643b' but no matching script tag was found. ")
+    console.log("Bokeh: ERROR: autoload.js configured with elementid '45af5007-7732-4a90-aecf-31eb952a512a' but no matching script tag was found. ")
     return false;
   }
 
@@ -12984,7 +12970,7 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
     
     function(Bokeh) {
       
-      document.getElementById("8fcc6a92-8880-4474-97b7-83964d06643b").textContent = "BokehJS is loading...";
+      document.getElementById("45af5007-7732-4a90-aecf-31eb952a512a").textContent = "BokehJS is loading...";
     },
     function(Bokeh) {
       console.log("Bokeh: injecting CSS: https://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.css");
@@ -13007,7 +12993,7 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
       console.log("Bokeh: BokehJS failed to load within specified timeout.");
       window._bokeh_failed_load = true;
     } else if (force !== true) {
-      var cell = $(document.getElementById("8fcc6a92-8880-4474-97b7-83964d06643b")).parents('.cell').data().cell;
+      var cell = $(document.getElementById("45af5007-7732-4a90-aecf-31eb952a512a")).parents('.cell').data().cell;
       cell.output_area.append_execute_result(NB_LOAD_WARNING)
     }
 
@@ -13062,17 +13048,13 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 
 <div class="output_html rendered_html output_subarea ">
 
 
     <div class="bk-root">
-        <div class="bk-plotdiv" id="55ab4233-cb12-45e7-a9e3-75881a4ca727"></div>
+        <div class="bk-plotdiv" id="d3db76e5-1bda-4a81-a593-c3151a7cd7d6"></div>
     </div>
 <script type="text/javascript">
   
@@ -13113,7 +13095,7 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
   
     function display_loaded() {
       if (window.Bokeh !== undefined) {
-        var el = document.getElementById("55ab4233-cb12-45e7-a9e3-75881a4ca727");
+        var el = document.getElementById("d3db76e5-1bda-4a81-a593-c3151a7cd7d6");
         el.textContent = "BokehJS " + Bokeh.version + " successfully loaded.";
       } else if (Date.now() < window._bokeh_timeout) {
         setTimeout(display_loaded, 100)
@@ -13160,9 +13142,9 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
         console.log("Bokeh: injecting script tag for BokehJS library: ", url);
         document.getElementsByTagName("head")[0].appendChild(s);
       }
-    };var element = document.getElementById("55ab4233-cb12-45e7-a9e3-75881a4ca727");
+    };var element = document.getElementById("d3db76e5-1bda-4a81-a593-c3151a7cd7d6");
     if (element == null) {
-      console.log("Bokeh: ERROR: autoload.js configured with elementid '55ab4233-cb12-45e7-a9e3-75881a4ca727' but no matching script tag was found. ")
+      console.log("Bokeh: ERROR: autoload.js configured with elementid 'd3db76e5-1bda-4a81-a593-c3151a7cd7d6' but no matching script tag was found. ")
       return false;
     }
   
@@ -13172,8 +13154,8 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
       function(Bokeh) {
         (function() {
           var fn = function() {
-            var docs_json = {"2ee0dd2b-968f-4652-b10b-1e7eb87baf3f":{"roots":{"references":[{"attributes":{"plot":null,"text":""},"id":"7ad643e3-6385-4623-bad5-5eb04b446230","type":"Title"},{"attributes":{"data_source":{"id":"1d828b79-6533-4fe5-8a90-79bf545e7070","type":"ColumnDataSource"},"glyph":{"id":"2ca9c7c1-aa29-4332-b5e0-38e6064c04b4","type":"Circle"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"558c2105-9ad2-4e94-b995-47a73871fb5c","type":"Circle"},"selection_glyph":null},"id":"a2d93566-0ae9-4355-8fe5-91df8c36303e","type":"GlyphRenderer"},{"attributes":{},"id":"e8e4ab3a-cbe5-4934-ae62-777ec97aa05d","type":"BasicTicker"},{"attributes":{"overlay":{"id":"eb577c6c-18e7-482f-b9af-61be4963ba6e","type":"BoxAnnotation"},"plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"}},"id":"a0dfedd4-2c5d-4f6d-a41a-1e3ea4b6c8b4","type":"BoxZoomTool"},{"attributes":{"plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"}},"id":"161bdc3c-afe3-4472-b964-baf9521078be","type":"SaveTool"},{"attributes":{"dimension":1,"plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"},"ticker":{"id":"e8e4ab3a-cbe5-4934-ae62-777ec97aa05d","type":"BasicTicker"}},"id":"3f287f47-1c64-428a-b9a9-c563468bbe1e","type":"Grid"},{"attributes":{"fill_color":{"field":"color"},"line_color":{"field":"color"},"size":{"units":"screen","value":8},"x":{"field":"x"},"y":{"field":"y"}},"id":"2ca9c7c1-aa29-4332-b5e0-38e6064c04b4","type":"Circle"},{"attributes":{"active_drag":"auto","active_inspect":"auto","active_scroll":{"id":"6d14df9e-7f5b-4f1a-8c35-6c9e0cdf192b","type":"WheelZoomTool"},"active_tap":"auto","tools":[{"id":"eebeda41-0499-47d8-913e-da4fee5064ab","type":"PanTool"},{"id":"6d14df9e-7f5b-4f1a-8c35-6c9e0cdf192b","type":"WheelZoomTool"},{"id":"a0dfedd4-2c5d-4f6d-a41a-1e3ea4b6c8b4","type":"BoxZoomTool"},{"id":"161bdc3c-afe3-4472-b964-baf9521078be","type":"SaveTool"},{"id":"93a2748b-81c4-499f-8240-9e5bd3a3e31f","type":"ResetTool"},{"id":"0a2508a3-2d99-4689-879d-ce3db01d3121","type":"HelpTool"}]},"id":"2f937efc-251c-4796-a913-4175cdc81c5a","type":"Toolbar"},{"attributes":{},"id":"e09467bb-21ca-4652-9ef6-580c70541fcc","type":"BasicTicker"},{"attributes":{"bottom_units":"screen","fill_alpha":{"value":0.5},"fill_color":{"value":"lightgrey"},"left_units":"screen","level":"overlay","line_alpha":{"value":1.0},"line_color":{"value":"black"},"line_dash":[4,4],"line_width":{"value":2},"plot":null,"render_mode":"css","right_units":"screen","top_units":"screen"},"id":"eb577c6c-18e7-482f-b9af-61be4963ba6e","type":"BoxAnnotation"},{"attributes":{},"id":"048033d6-8fd1-468a-81a9-56b77355b678","type":"ToolEvents"},{"attributes":{},"id":"72e43b4a-5311-4e69-a291-86ed066a49d5","type":"LinearScale"},{"attributes":{},"id":"7bb07e03-2729-4c27-bc72-146e8d282297","type":"BasicTickFormatter"},{"attributes":{"plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"}},"id":"93a2748b-81c4-499f-8240-9e5bd3a3e31f","type":"ResetTool"},{"attributes":{"callback":null},"id":"a5ced2cd-97c5-4e50-89f1-bcb981208235","type":"DataRange1d"},{"attributes":{"plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"},"ticker":{"id":"e09467bb-21ca-4652-9ef6-580c70541fcc","type":"BasicTicker"}},"id":"8ce1237a-45a9-4975-ac73-8ea577fa8044","type":"Grid"},{"attributes":{"formatter":{"id":"b520b035-6c0c-41cb-b736-0bdb418e311d","type":"BasicTickFormatter"},"plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"},"ticker":{"id":"e09467bb-21ca-4652-9ef6-580c70541fcc","type":"BasicTicker"}},"id":"784d67c0-8bbe-4f52-8e29-c36374fdd732","type":"LinearAxis"},{"attributes":{"plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"}},"id":"6d14df9e-7f5b-4f1a-8c35-6c9e0cdf192b","type":"WheelZoomTool"},{"attributes":{"plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"}},"id":"eebeda41-0499-47d8-913e-da4fee5064ab","type":"PanTool"},{"attributes":{"below":[{"id":"784d67c0-8bbe-4f52-8e29-c36374fdd732","type":"LinearAxis"}],"left":[{"id":"e48694a3-01bb-42a7-804e-70a88cec065e","type":"LinearAxis"}],"plot_height":500,"plot_width":900,"renderers":[{"id":"784d67c0-8bbe-4f52-8e29-c36374fdd732","type":"LinearAxis"},{"id":"8ce1237a-45a9-4975-ac73-8ea577fa8044","type":"Grid"},{"id":"e48694a3-01bb-42a7-804e-70a88cec065e","type":"LinearAxis"},{"id":"3f287f47-1c64-428a-b9a9-c563468bbe1e","type":"Grid"},{"id":"eb577c6c-18e7-482f-b9af-61be4963ba6e","type":"BoxAnnotation"},{"id":"a2d93566-0ae9-4355-8fe5-91df8c36303e","type":"GlyphRenderer"},{"id":"87d42655-c0dd-42a6-a51e-95fcc09c0378","type":"LabelSet"}],"title":{"id":"7ad643e3-6385-4623-bad5-5eb04b446230","type":"Title"},"tool_events":{"id":"048033d6-8fd1-468a-81a9-56b77355b678","type":"ToolEvents"},"toolbar":{"id":"2f937efc-251c-4796-a913-4175cdc81c5a","type":"Toolbar"},"x_range":{"id":"a5ced2cd-97c5-4e50-89f1-bcb981208235","type":"DataRange1d"},"x_scale":{"id":"72e43b4a-5311-4e69-a291-86ed066a49d5","type":"LinearScale"},"y_range":{"id":"206afa41-f967-4f76-bf70-f4b1e46d9ef5","type":"DataRange1d"},"y_scale":{"id":"30420dfd-cf40-4167-a9d3-af396fae85cd","type":"LinearScale"}},"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"},{"attributes":{},"id":"30420dfd-cf40-4167-a9d3-af396fae85cd","type":"LinearScale"},{"attributes":{"level":"glyph","plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"},"source":{"id":"1d828b79-6533-4fe5-8a90-79bf545e7070","type":"ColumnDataSource"},"text":{"field":"names"},"x":{"field":"x"},"y":{"field":"y"}},"id":"87d42655-c0dd-42a6-a51e-95fcc09c0378","type":"LabelSet"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"#1f77b4"},"line_alpha":{"value":0.1},"line_color":{"value":"#1f77b4"},"size":{"units":"screen","value":8},"x":{"field":"x"},"y":{"field":"y"}},"id":"558c2105-9ad2-4e94-b995-47a73871fb5c","type":"Circle"},{"attributes":{"formatter":{"id":"7bb07e03-2729-4c27-bc72-146e8d282297","type":"BasicTickFormatter"},"plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"},"ticker":{"id":"e8e4ab3a-cbe5-4934-ae62-777ec97aa05d","type":"BasicTicker"}},"id":"e48694a3-01bb-42a7-804e-70a88cec065e","type":"LinearAxis"},{"attributes":{"plot":{"id":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad","subtype":"Figure","type":"Plot"}},"id":"0a2508a3-2d99-4689-879d-ce3db01d3121","type":"HelpTool"},{"attributes":{"callback":null},"id":"206afa41-f967-4f76-bf70-f4b1e46d9ef5","type":"DataRange1d"},{"attributes":{},"id":"b520b035-6c0c-41cb-b736-0bdb418e311d","type":"BasicTickFormatter"},{"attributes":{"callback":null,"column_names":["color","y","names","x"],"data":{"color":["#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#ef8a62","#ef8a62","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#ef8a62"],"names":["METTS MARK","CORDES WILLIAM R","HANNON KEVIN P","MEYER ROCKFORD G","MCMAHON JEFFREY","HAEDICKE MARK E","PIPER GREGORY F","HUMPHREY GENE E","BLACHMAN JEREMY M","SUNDE MARTIN","GIBBS DANA R","COLWELL WESLEY","MULLER MARK S","JACKSON CHARLENE R","WALLS JR ROBERT H","KITCHEN LOUISE","SHANKMAN JEFFREY A","BERGSIEKER RICHARD P","BIBI PHILIPPE A","PIRO JIM","RIEKER PAULA H","BECK SALLY W","HAUG DAVID L","HICKERSON GARY J","LEWIS RICHARD","HAYES ROBERT E","LEFF DANIEL P","LAVORATO JOHN J","POWERS WILLIAM","BANNANTINE JAMES M","SHAPIRO RICHARD S","SHERRIFF JOHN R","SHELBY REX","DEFFNER JOSEPH M","WHALLEY LAWRENCE G","MCCARTY DANNY J","MCCONNELL MICHAEL S","DELAINEY DAVID W","FOY JOE","LAY KENNETH L","OLSON CINDY K","PICKERING MARK R","HUGHES JAMES A","HORTON STANLEY C","BOWEN JR RAYMOND M","FITZGERALD JAY L","MORAN MICHAEL P","REDMOND BRIAN L","BELDEN TIMOTHY N","DURAN WILLIAM D","THORN TERENCE H","CALGER CHRISTOPHER F","RICE KENNETH D","KAMINSKI WINCENTY J","COX DAVID","SKILLING JEFFREY K","SHERRICK JEFFREY B","UMANOFF ADAM S","KEAN STEVEN J","FOWLER PEGGY","WASAFF GEORGE","ALLEN PHILLIP K","SHARP VICTORIA T","BROWN MICHAEL","MCCLELLAN GEORGE","CARTER REBECCA C","MCDONALD REBECCA","BHATNAGAR SANJAY","BUCHANAN HAROLD G","MURRAY JULIA H","GARLAND C KEVIN","DODSON KEITH","DIETRICH JANET R","DERRICK JR. JAMES V","FREVERT MARK A","HAYSLETT RODERICK J","FALLON JAMES B","KOENIG MARK E","IZZO LAWRENCE L","TILNEY ELIZABETH A","MARTIN AMANDA K","BUY RICHARD B","CAUSEY RICHARD A","TAYLOR MITCHELL S","DONAHUE JR JEFFREY M","GLISAN JR BEN F"],"x":{"__ndarray__":"buTFg3+TUEDr2YSH07ZOwFhA+oYSSj1AHI4E+9xHI0AOq06uCBI9wFXbLKgjIVFAuxLkHph7JEA+htlU0i1iQPquereqOybAFuo8EyPWNkBm5+Y9JvlXwFlFZ8AdB1NAQpkSZrN7U0CULK0Rk5lYQPo8HM7s+YvAWE2w3Fp7MsAygHa8+tFEwNadIc8Y3VpAmOX9ScdZLsDO/0MObohQwChS9hjApUlAJ1V6pwznR0DdOabnAT9HQC69Td4vaUJAALKGqM0OQ0DqecXJK4lRwEJzsDSDY1NAul1ik115T8AdyNnjBdtLwCM0+kH8jJBAVnIksqNFTMCbVZ2dPj9CwNicAFLQbkHAwCaYS/rBSMC/T/S9z3NDwPj+yjRBNDtADHUaliubQ0BdJST3+2w4wFEUJzO1yVTAJIluwJfrOkDlBj4vZphFwFDVqSvjCjfABTnnjK/qQkBKwLDe/MAhwCOgcI84c2tAWuPRFGxNTkCJ2Spda8xTwEqjLZgD/lFANmxkYgB9V8CS2eDocq82wJkrmpsuxaS/NbUfFuBCOEAgTwcaECRTwG7roZMyuFZA+84S21wKUEAprkNYTuslQK3zV270klXAbucHt616RcAn7qOh2fNCwC2KjY2FalFALdkWFqAJQ0AJebxTPIInwIb9Uom0KS1AD3gx0KvuS8BxzmlM+2BWQKxsuQSqEVrA8+krYy8VTUA1Vz3kaediwFzaZO1xRlzALwBemZrLUsAx/1rJmHX8v9R2d5XxKEbANKZK6TMqIcAI7QldzfUpQNDMV5GpTf2/xr69t6YMVcAf60dVvJ5BwGA1/FyYdVpAIEhJRx97QUBHFWCnF8lUwEJIAExO8yPAVp5TGc6gLkCwvw5UmpM2QEpNL2sFUCfAkjVwr/GcT0DgNe649tAUQA==","dtype":"float64","shape":[86]},"y":{"__ndarray__":"Pro6bJJhP8CVyGURhlFQwHK6UqfE+FjAfdcvNo/BYECbktenuKwzQCgJvMCl7ljAMF9qFo3zXsBLtHZ4THRpQE3iARtMRTXA4mEKV4T+RMDpnuPyBw5WwCr0F8GkaErAC7q3PS6jVEB+mMfDuUcrQNe9RGUhvHHARaeAAD8QHEBijdIjIzM0QOo23ZuG6DVAScSrRtiDXEBx6RXsgh42wIuJWnFWnVHA02usus3sRcA/vf3mBCVMQIb90CL3sTlAEZl+HNFpV0BqVuBMRUdBwKXHzNZdriJAVfs9tpv0KECanAjCUzk+wCns90CkEGNAd4XuvOvWSEC8XAKQ0HtGQH+bWJXElF7Ahjxsm8ULVkBpLMCCDcZKwE5p4Ug+5VZAwTnBGMCYXUDQuzUcp9JCQLuaDZQm5yrAL7kXNnueUMCpNGTg5+xiwBW9qpzTE1LAm9LyaUjVU0CvOvzJvB5ZwJlI7RCxq0xAEWaSlihCAcA5oqKDkQg7wMmarnPi1WZAgPL/gpFqMkD7qrtYTDdaQBSrr919rFJAeKlKR48uQECFCt/eJ8w+QA9tDEpHyirAXxgIuABlRMCnLMynd/ZqwPF+aH45h1DAxNcemYxGU0ATyjWb5epVwGRt+zKV2EpAjk89RSdrBMD+bB+2nsVLwJnTkr6DuDzAEnQCjfgQMsAUYizwbiBDwPqixCBgKwDAJwYAuC6CTkAqZxU7HnxZwNT6xSIo2jrAxUsvLZdLS0Bs4g7yKUY4wE4M82pHwCnAdkCu9l6oWUBHE17kyLNVwIPa3qgIvjVArZYua+SxQ8Al/Zwh8rI9QFfn/XXEKGRAoKYAczRLO8BnX0M4CXlUQDUJk1geFUdA5LtFJfKOF0C3epiFwcVNQM+ksCEE5VFA02pTAf+gOkC3WV2ZoQNFwA==","dtype":"float64","shape":[86]}}},"id":"1d828b79-6533-4fe5-8a90-79bf545e7070","type":"ColumnDataSource"}],"root_ids":["39df64b4-612a-4dcd-8a54-7cc0a91f27ad"]},"title":"Bokeh Application","version":"0.12.6"}};
-            var render_items = [{"docid":"2ee0dd2b-968f-4652-b10b-1e7eb87baf3f","elementid":"55ab4233-cb12-45e7-a9e3-75881a4ca727","modelid":"39df64b4-612a-4dcd-8a54-7cc0a91f27ad"}];
+            var docs_json = {"f734d48b-e44e-4129-9cb0-5d9f54233602":{"roots":{"references":[{"attributes":{"plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"}},"id":"587384f0-9b15-4b37-b7e4-796473bf7122","type":"ResetTool"},{"attributes":{},"id":"52c14ca6-458d-448c-95cb-05519821f9c5","type":"BasicTickFormatter"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"#1f77b4"},"line_alpha":{"value":0.1},"line_color":{"value":"#1f77b4"},"size":{"units":"screen","value":8},"x":{"field":"x"},"y":{"field":"y"}},"id":"e7d66193-9d52-4d59-8cba-4954a2c117aa","type":"Circle"},{"attributes":{"bottom_units":"screen","fill_alpha":{"value":0.5},"fill_color":{"value":"lightgrey"},"left_units":"screen","level":"overlay","line_alpha":{"value":1.0},"line_color":{"value":"black"},"line_dash":[4,4],"line_width":{"value":2},"plot":null,"render_mode":"css","right_units":"screen","top_units":"screen"},"id":"451973aa-d30d-46bf-8cc9-ae904f802eb3","type":"BoxAnnotation"},{"attributes":{"callback":null},"id":"aafbf0be-defa-4b04-8a64-1d2636a22b53","type":"DataRange1d"},{"attributes":{"overlay":{"id":"451973aa-d30d-46bf-8cc9-ae904f802eb3","type":"BoxAnnotation"},"plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"}},"id":"58cddb05-c5c4-407e-a42d-f1eedcc421a9","type":"BoxZoomTool"},{"attributes":{},"id":"1451c9f4-6d86-44ff-86b9-172799dc4d87","type":"BasicTickFormatter"},{"attributes":{},"id":"094a56d7-338e-4826-8833-1b44f71a309d","type":"LinearScale"},{"attributes":{"plot":null,"text":""},"id":"6418dc7f-ab39-4bd6-97dd-1386c304c5f7","type":"Title"},{"attributes":{},"id":"4d8733d2-168d-4066-bef4-49ee097d61d1","type":"ToolEvents"},{"attributes":{},"id":"52822670-c8b4-4a22-9a42-402161c81a27","type":"BasicTicker"},{"attributes":{"plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"}},"id":"734a3ab0-1046-481a-9256-c473fc880e08","type":"PanTool"},{"attributes":{"active_drag":"auto","active_inspect":"auto","active_scroll":{"id":"8f12517b-a4fd-42a9-9762-721c5e36e789","type":"WheelZoomTool"},"active_tap":"auto","tools":[{"id":"734a3ab0-1046-481a-9256-c473fc880e08","type":"PanTool"},{"id":"8f12517b-a4fd-42a9-9762-721c5e36e789","type":"WheelZoomTool"},{"id":"58cddb05-c5c4-407e-a42d-f1eedcc421a9","type":"BoxZoomTool"},{"id":"02c15acb-f33c-4518-a0e2-34d76c1df897","type":"SaveTool"},{"id":"587384f0-9b15-4b37-b7e4-796473bf7122","type":"ResetTool"},{"id":"e34ae70e-4b5e-4f7a-aae4-8c975fc5adc0","type":"HelpTool"}]},"id":"d77962e5-877c-4748-965f-6bdd72e8a906","type":"Toolbar"},{"attributes":{"plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"}},"id":"02c15acb-f33c-4518-a0e2-34d76c1df897","type":"SaveTool"},{"attributes":{"plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"}},"id":"e34ae70e-4b5e-4f7a-aae4-8c975fc5adc0","type":"HelpTool"},{"attributes":{},"id":"da6fdac9-89ee-423d-90d8-2c8322c9b540","type":"LinearScale"},{"attributes":{"formatter":{"id":"1451c9f4-6d86-44ff-86b9-172799dc4d87","type":"BasicTickFormatter"},"plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"},"ticker":{"id":"2bf7e36a-3f35-403e-aa04-83573b1c06bf","type":"BasicTicker"}},"id":"ecfb0b9b-147d-4404-a082-14b6c4a84f8e","type":"LinearAxis"},{"attributes":{"plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"}},"id":"8f12517b-a4fd-42a9-9762-721c5e36e789","type":"WheelZoomTool"},{"attributes":{"callback":null},"id":"f3e8b8a9-2d8d-4beb-85ba-0a13c3b447e2","type":"DataRange1d"},{"attributes":{"formatter":{"id":"52c14ca6-458d-448c-95cb-05519821f9c5","type":"BasicTickFormatter"},"plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"},"ticker":{"id":"52822670-c8b4-4a22-9a42-402161c81a27","type":"BasicTicker"}},"id":"9a5c9aa0-9d19-42f9-be9d-5302e732ea5b","type":"LinearAxis"},{"attributes":{"data_source":{"id":"03acfa0f-e709-46b1-b8b6-179a22e0770e","type":"ColumnDataSource"},"glyph":{"id":"4d3ac985-5e9a-4168-8b69-351050d03eb3","type":"Circle"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"e7d66193-9d52-4d59-8cba-4954a2c117aa","type":"Circle"},"selection_glyph":null},"id":"bf50cdc8-ae55-40a5-91c3-e8db36d8f633","type":"GlyphRenderer"},{"attributes":{"fill_color":{"field":"color"},"line_color":{"field":"color"},"size":{"units":"screen","value":8},"x":{"field":"x"},"y":{"field":"y"}},"id":"4d3ac985-5e9a-4168-8b69-351050d03eb3","type":"Circle"},{"attributes":{"dimension":1,"plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"},"ticker":{"id":"2bf7e36a-3f35-403e-aa04-83573b1c06bf","type":"BasicTicker"}},"id":"e3083620-df92-4e69-a6a0-8091b2bab7cd","type":"Grid"},{"attributes":{"level":"glyph","plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"},"source":{"id":"03acfa0f-e709-46b1-b8b6-179a22e0770e","type":"ColumnDataSource"},"text":{"field":"names"},"x":{"field":"x"},"y":{"field":"y"}},"id":"d601426e-12ca-4139-ae90-78183a5db49b","type":"LabelSet"},{"attributes":{"callback":null,"column_names":["color","y","names","x"],"data":{"color":["#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#ef8a62","#ef8a62","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#67a9cf","#67a9cf","#ef8a62","#67a9cf","#67a9cf","#ef8a62"],"names":["METTS MARK","CORDES WILLIAM R","HANNON KEVIN P","MEYER ROCKFORD G","MCMAHON JEFFREY","HAEDICKE MARK E","PIPER GREGORY F","HUMPHREY GENE E","BLACHMAN JEREMY M","SUNDE MARTIN","GIBBS DANA R","COLWELL WESLEY","MULLER MARK S","JACKSON CHARLENE R","WALLS JR ROBERT H","KITCHEN LOUISE","SHANKMAN JEFFREY A","BERGSIEKER RICHARD P","BIBI PHILIPPE A","PIRO JIM","RIEKER PAULA H","BECK SALLY W","HAUG DAVID L","HICKERSON GARY J","LEWIS RICHARD","HAYES ROBERT E","LEFF DANIEL P","LAVORATO JOHN J","POWERS WILLIAM","BANNANTINE JAMES M","SHAPIRO RICHARD S","SHERRIFF JOHN R","SHELBY REX","DEFFNER JOSEPH M","WHALLEY LAWRENCE G","MCCARTY DANNY J","MCCONNELL MICHAEL S","DELAINEY DAVID W","FOY JOE","LAY KENNETH L","OLSON CINDY K","PICKERING MARK R","HUGHES JAMES A","HORTON STANLEY C","BOWEN JR RAYMOND M","FITZGERALD JAY L","MORAN MICHAEL P","REDMOND BRIAN L","BELDEN TIMOTHY N","DURAN WILLIAM D","THORN TERENCE H","CALGER CHRISTOPHER F","RICE KENNETH D","KAMINSKI WINCENTY J","COX DAVID","SKILLING JEFFREY K","SHERRICK JEFFREY B","UMANOFF ADAM S","KEAN STEVEN J","FOWLER PEGGY","WASAFF GEORGE","ALLEN PHILLIP K","SHARP VICTORIA T","BROWN MICHAEL","MCCLELLAN GEORGE","CARTER REBECCA C","MCDONALD REBECCA","BHATNAGAR SANJAY","BUCHANAN HAROLD G","MURRAY JULIA H","GARLAND C KEVIN","DODSON KEITH","DIETRICH JANET R","DERRICK JR. JAMES V","FREVERT MARK A","HAYSLETT RODERICK J","FALLON JAMES B","KOENIG MARK E","IZZO LAWRENCE L","TILNEY ELIZABETH A","MARTIN AMANDA K","BUY RICHARD B","CAUSEY RICHARD A","TAYLOR MITCHELL S","DONAHUE JR JEFFREY M","GLISAN JR BEN F"],"x":{"__ndarray__":"buTFg3+TUEDr2YSH07ZOwFhA+oYSSj1AHI4E+9xHI0AOq06uCBI9wFXbLKgjIVFAuxLkHph7JEA+htlU0i1iQPquereqOybAFuo8EyPWNkBm5+Y9JvlXwFlFZ8AdB1NAQpkSZrN7U0CULK0Rk5lYQPo8HM7s+YvAWE2w3Fp7MsAygHa8+tFEwNadIc8Y3VpAmOX9ScdZLsDO/0MObohQwChS9hjApUlAJ1V6pwznR0DdOabnAT9HQC69Td4vaUJAALKGqM0OQ0DqecXJK4lRwEJzsDSDY1NAul1ik115T8AdyNnjBdtLwCM0+kH8jJBAVnIksqNFTMCbVZ2dPj9CwNicAFLQbkHAwCaYS/rBSMC/T/S9z3NDwPj+yjRBNDtADHUaliubQ0BdJST3+2w4wFEUJzO1yVTAJIluwJfrOkDlBj4vZphFwFDVqSvjCjfABTnnjK/qQkBKwLDe/MAhwCOgcI84c2tAWuPRFGxNTkCJ2Spda8xTwEqjLZgD/lFANmxkYgB9V8CS2eDocq82wJkrmpsuxaS/NbUfFuBCOEAgTwcaECRTwG7roZMyuFZA+84S21wKUEAprkNYTuslQK3zV270klXAbucHt616RcAn7qOh2fNCwC2KjY2FalFALdkWFqAJQ0AJebxTPIInwIb9Uom0KS1AD3gx0KvuS8BxzmlM+2BWQKxsuQSqEVrA8+krYy8VTUA1Vz3kaediwFzaZO1xRlzALwBemZrLUsAx/1rJmHX8v9R2d5XxKEbANKZK6TMqIcAI7QldzfUpQNDMV5GpTf2/xr69t6YMVcAf60dVvJ5BwGA1/FyYdVpAIEhJRx97QUBHFWCnF8lUwEJIAExO8yPAVp5TGc6gLkCwvw5UmpM2QEpNL2sFUCfAkjVwr/GcT0DgNe649tAUQA==","dtype":"float64","shape":[86]},"y":{"__ndarray__":"Pro6bJJhP8CVyGURhlFQwHK6UqfE+FjAfdcvNo/BYECbktenuKwzQCgJvMCl7ljAMF9qFo3zXsBLtHZ4THRpQE3iARtMRTXA4mEKV4T+RMDpnuPyBw5WwCr0F8GkaErAC7q3PS6jVEB+mMfDuUcrQNe9RGUhvHHARaeAAD8QHEBijdIjIzM0QOo23ZuG6DVAScSrRtiDXEBx6RXsgh42wIuJWnFWnVHA02usus3sRcA/vf3mBCVMQIb90CL3sTlAEZl+HNFpV0BqVuBMRUdBwKXHzNZdriJAVfs9tpv0KECanAjCUzk+wCns90CkEGNAd4XuvOvWSEC8XAKQ0HtGQH+bWJXElF7Ahjxsm8ULVkBpLMCCDcZKwE5p4Ug+5VZAwTnBGMCYXUDQuzUcp9JCQLuaDZQm5yrAL7kXNnueUMCpNGTg5+xiwBW9qpzTE1LAm9LyaUjVU0CvOvzJvB5ZwJlI7RCxq0xAEWaSlihCAcA5oqKDkQg7wMmarnPi1WZAgPL/gpFqMkD7qrtYTDdaQBSrr919rFJAeKlKR48uQECFCt/eJ8w+QA9tDEpHyirAXxgIuABlRMCnLMynd/ZqwPF+aH45h1DAxNcemYxGU0ATyjWb5epVwGRt+zKV2EpAjk89RSdrBMD+bB+2nsVLwJnTkr6DuDzAEnQCjfgQMsAUYizwbiBDwPqixCBgKwDAJwYAuC6CTkAqZxU7HnxZwNT6xSIo2jrAxUsvLZdLS0Bs4g7yKUY4wE4M82pHwCnAdkCu9l6oWUBHE17kyLNVwIPa3qgIvjVArZYua+SxQ8Al/Zwh8rI9QFfn/XXEKGRAoKYAczRLO8BnX0M4CXlUQDUJk1geFUdA5LtFJfKOF0C3epiFwcVNQM+ksCEE5VFA02pTAf+gOkC3WV2ZoQNFwA==","dtype":"float64","shape":[86]}}},"id":"03acfa0f-e709-46b1-b8b6-179a22e0770e","type":"ColumnDataSource"},{"attributes":{"below":[{"id":"9a5c9aa0-9d19-42f9-be9d-5302e732ea5b","type":"LinearAxis"}],"left":[{"id":"ecfb0b9b-147d-4404-a082-14b6c4a84f8e","type":"LinearAxis"}],"plot_height":500,"plot_width":900,"renderers":[{"id":"9a5c9aa0-9d19-42f9-be9d-5302e732ea5b","type":"LinearAxis"},{"id":"1fa30f0f-84ff-49af-91b1-8ed23e40d090","type":"Grid"},{"id":"ecfb0b9b-147d-4404-a082-14b6c4a84f8e","type":"LinearAxis"},{"id":"e3083620-df92-4e69-a6a0-8091b2bab7cd","type":"Grid"},{"id":"451973aa-d30d-46bf-8cc9-ae904f802eb3","type":"BoxAnnotation"},{"id":"bf50cdc8-ae55-40a5-91c3-e8db36d8f633","type":"GlyphRenderer"},{"id":"d601426e-12ca-4139-ae90-78183a5db49b","type":"LabelSet"}],"title":{"id":"6418dc7f-ab39-4bd6-97dd-1386c304c5f7","type":"Title"},"tool_events":{"id":"4d8733d2-168d-4066-bef4-49ee097d61d1","type":"ToolEvents"},"toolbar":{"id":"d77962e5-877c-4748-965f-6bdd72e8a906","type":"Toolbar"},"x_range":{"id":"f3e8b8a9-2d8d-4beb-85ba-0a13c3b447e2","type":"DataRange1d"},"x_scale":{"id":"da6fdac9-89ee-423d-90d8-2c8322c9b540","type":"LinearScale"},"y_range":{"id":"aafbf0be-defa-4b04-8a64-1d2636a22b53","type":"DataRange1d"},"y_scale":{"id":"094a56d7-338e-4826-8833-1b44f71a309d","type":"LinearScale"}},"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"},{"attributes":{"plot":{"id":"37a0ceff-192b-4bcc-b115-43af3ef545fa","subtype":"Figure","type":"Plot"},"ticker":{"id":"52822670-c8b4-4a22-9a42-402161c81a27","type":"BasicTicker"}},"id":"1fa30f0f-84ff-49af-91b1-8ed23e40d090","type":"Grid"},{"attributes":{},"id":"2bf7e36a-3f35-403e-aa04-83573b1c06bf","type":"BasicTicker"}],"root_ids":["37a0ceff-192b-4bcc-b115-43af3ef545fa"]},"title":"Bokeh Application","version":"0.12.6"}};
+            var render_items = [{"docid":"f734d48b-e44e-4129-9cb0-5d9f54233602","elementid":"d3db76e5-1bda-4a81-a593-c3151a7cd7d6","modelid":"37a0ceff-192b-4bcc-b115-43af3ef545fa"}];
             
             Bokeh.embed.embed_items(docs_json, render_items);
           };
@@ -13198,7 +13180,7 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
         console.log("Bokeh: BokehJS failed to load within specified timeout.");
         window._bokeh_failed_load = true;
       } else if (force !== true) {
-        var cell = $(document.getElementById("55ab4233-cb12-45e7-a9e3-75881a4ca727")).parents('.cell').data().cell;
+        var cell = $(document.getElementById("d3db76e5-1bda-4a81-a593-c3151a7cd7d6")).parents('.cell').data().cell;
         cell.output_area.append_execute_result(NB_LOAD_WARNING)
       }
   
@@ -13223,7 +13205,8 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -13232,7 +13215,8 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -13263,11 +13247,7 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[21]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[21]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -14807,11 +14787,7 @@ var element = $('#f69019dc-5d16-4912-99ca-53de9efd3615');
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 
 
 <div class="output_png output_subarea ">
@@ -15477,7 +15453,8 @@ Y3La/wAMW2gSWWhwwAAAAABJRU5ErkJggg==
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -15511,11 +15488,7 @@ Y3La/wAMW2gSWWhwwAAAAABJRU5ErkJggg==
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 
 
 <div class="output_png output_subarea ">
@@ -16101,7 +16074,8 @@ o9FoNJpqQitdjUaj0Wiqif8Pzh6PnWe1vY8AAAAASUVORK5CYII=
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -16110,11 +16084,12 @@ o9FoNJpqQitdjUaj0Wiqif8Pzh6PnWe1vY8AAAAASUVORK5CYII=
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Email-features">Email features<a class="anchor-link" href="#Email-features">&#194;&#182;</a></h3>
+<h3 id="Email-features">Email features<a class="anchor-link" href="#Email-features">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -16134,11 +16109,7 @@ o9FoNJpqQitdjUaj0Wiqif8Pzh6PnWe1vY8AAAAASUVORK5CYII=
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 
 
 <div class="output_png output_subarea ">
@@ -16761,7 +16732,8 @@ AAAASUVORK5CYII=
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -16789,11 +16761,7 @@ AAAASUVORK5CYII=
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 
 
 <div class="output_png output_subarea ">
@@ -17489,7 +17457,8 @@ iIiIiEgNU0JGRERERERERKSG/X86JSxLH2LKLwAAAABJRU5ErkJggg==
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -17522,11 +17491,7 @@ iIiIiEgNU0JGRERERERERKSG/X86JSxLH2LKLwAAAABJRU5ErkJggg==
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
+<div class="output_area"><div class="prompt"></div>
 
 
 <div class="output_png output_subarea ">
@@ -17652,7 +17617,8 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -17661,19 +17627,104 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Selected-features">Selected features<a class="anchor-link" href="#Selected-features">&#194;&#182;</a></h3>
+<h1 id="Training">Training<a class="anchor-link" href="#Training">&#182;</a></h1>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In order to be able to test the trained model on a different sample then the training sample, the data has to be split. Since there are only few positive, i.e. POI, data sets in the full data sample, <strong>stratified sampling</strong> is performed to evenly distribute POIs among the different sample.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Validation">Validation<a class="anchor-link" href="#Validation">&#182;</a></h1><p>To be able to measure the performance more accurate, a method called <strong>Stratified Shuffle Split</strong> is used: the data is divided in 10 stratified samples. 9 of these are used for training and 1 of testing. By altering the sample used for testing ten training and testing cycles are performed. The stratification ensures, that POI and non-POI samples are equally distrubuted among the 10 samples. If pure random sampling would be used, there is a high change to obtain training or testing samples with too few POI samples.</p>
+<p>Validation is important to quantify the preformance of the model on new data. Espacially, since machine learning algorithms are prone to overfitting in which case the performance on the training sample is good but the performance on data new to the algorithm is pretty bad. With validation overfitting problems can be revealed.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Feature-selection-in-training.">Feature selection in training.<a class="anchor-link" href="#Feature-selection-in-training.">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In order to show the feature that are automatically selected by feature selection method I train the best algorithm with the found optimal hyper-parameter set on the complete data set, while the performance has been measured using stratified sampling on a test set after training the model on a training set.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Results">Results<a class="anchor-link" href="#Results">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>According to the <a href="http://scikit-learn.org/stable/tutorial/machine_learning_map/index.html">scikit learn flow chart</a> I decided to test the following three classification ML-algorithms:</p>
+<ol>
+<li>Support Vector Classification (SVC)</li>
+<li>k-Nearest Neighbors Classification (kNN)</li>
+<li>Random Forest Classification (RF)</li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Performance-Measure">Performance Measure<a class="anchor-link" href="#Performance-Measure">&#182;</a></h2><p>Since the data is dominated by Non-POIs, the accuracy might not be the best measure for the performance, since always assuming false (i.e. the respective employee is a non-POI) already results in an accuracy of 83%. Therefore, I chose to score the models based on the F1 score for the positive , i.e. POI, class. The F1 score is average of precision and recall.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Feature-selection">Feature selection<a class="anchor-link" href="#Feature-selection">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To get the final feature selection the feature selection model has to be trained on the data.</p>
 
 </div>
 </div>
@@ -17683,60 +17734,15 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[27]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">FeatureUnion</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">FunctionTransformer</span><span class="p">,</span> <span class="n">StandardScaler</span>
-<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">SelectKBest</span><span class="p">,</span> <span class="n">f_classif</span><span class="p">,</span> <span class="n">SelectFromModel</span>
-<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">MultinomialNB</span>
-<span class="kn">from</span> <span class="nn">poi_id</span> <span class="kn">import</span> <span class="n">SelectMatchFeatures</span><span class="p">,</span> <span class="n">SelectFeatureList</span><span class="p">,</span> <span class="n">log_trans</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">my_tester</span> <span class="kn">import</span> <span class="n">load_classifier_and_data</span>
+<span class="kn">from</span> <span class="nn">poi_id</span> <span class="kn">import</span> <span class="n">extract_labels_features</span><span class="p">,</span> <span class="n">SelectMatchFeatures</span><span class="p">,</span> <span class="n">SelectFeatureList</span><span class="p">,</span> <span class="n">log_trans</span><span class="p">,</span> <span class="n">ImputeOrZero</span>
 
-<span class="c1"># Process word vectors from email texts</span>
-<span class="n">pipeline_email_text</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s2">&quot;GetEmailText&quot;</span><span class="p">,</span> <span class="n">SelectMatchFeatures</span><span class="p">(</span><span class="n">feature_match</span><span class="o">=</span><span class="s2">&quot;word_.*&quot;</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">&quot;SelectPercentile&quot;</span><span class="p">,</span> <span class="n">SelectKBest</span><span class="p">(</span><span class="n">score_func</span><span class="o">=</span><span class="n">f_classif</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">20</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">&quot;NaiveBayes&quot;</span><span class="p">,</span> <span class="n">SelectFromModel</span><span class="p">(</span><span class="n">MultinomialNB</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fit_prior</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)),</span>
-<span class="p">])</span>
+<span class="c1"># Load trained classifier</span>
+<span class="n">clf</span><span class="p">,</span> <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_classifier_and_data</span><span class="p">()</span>
 
-<span class="c1"># Process financial features</span>
-<span class="n">pipeline_financial</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s2">&quot;Selector&quot;</span><span class="p">,</span> 
-     <span class="n">SelectFeatureList</span><span class="p">(</span><span class="n">selected_feature_list</span><span class="o">=</span><span class="n">FEATURES_FINANCIAL</span><span class="p">,</span> <span class="n">convert_to_numeric</span><span class="o">=</span><span class="bp">True</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">&quot;ConvertToVector&quot;</span><span class="p">,</span> <span class="n">DictVectorizer</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">&quot;Imputer&quot;</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">&quot;Log1P&quot;</span><span class="p">,</span> <span class="n">FunctionTransformer</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">log_trans</span><span class="p">)),</span>
-<span class="p">])</span> 
-
-<span class="c1"># Process email count features</span>
-<span class="n">pipeline_email</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s2">&quot;Selector&quot;</span><span class="p">,</span> 
-     <span class="n">SelectFeatureList</span><span class="p">(</span>
-         <span class="n">selected_feature_list</span><span class="o">=</span><span class="n">FEATURES_EMAIL</span><span class="p">,</span> <span class="n">convert_to_numeric</span><span class="o">=</span><span class="bp">True</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">&quot;ConvertToVector&quot;</span><span class="p">,</span> <span class="n">DictVectorizer</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="bp">False</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">&quot;Imputer&quot;</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">&quot;Log1P&quot;</span><span class="p">,</span> <span class="n">FunctionTransformer</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)))),</span>
-<span class="p">])</span>
-
-<span class="c1"># Process subject line features</span>
-<span class="n">pipeline_subjects</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s2">&quot;GetEmailText&quot;</span><span class="p">,</span> <span class="n">SelectMatchFeatures</span><span class="p">(</span><span class="n">feature_match</span><span class="o">=</span><span class="s2">&quot;sub_.*&quot;</span><span class="p">)),</span>
-    <span class="p">(</span><span class="s2">&quot;SelectPercentile&quot;</span><span class="p">,</span> <span class="n">SelectKBest</span><span class="p">(</span><span class="n">score_func</span><span class="o">=</span><span class="n">f_classif</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">)),</span>
-<span class="p">])</span>
-
-<span class="c1"># Combine email text features and other features</span>
-<span class="c1"># then run classifier on these features</span>
-<span class="n">pipeline_union</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
-    <span class="p">(</span><span class="s2">&quot;union&quot;</span><span class="p">,</span> <span class="n">FeatureUnion</span><span class="p">(</span>
-        <span class="n">transformer_list</span><span class="o">=</span><span class="p">[</span>
-                <span class="p">(</span><span class="s2">&quot;email_text&quot;</span><span class="p">,</span> <span class="n">pipeline_email_text</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;subjects&quot;</span><span class="p">,</span> <span class="n">pipeline_subjects</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;financial&quot;</span><span class="p">,</span> <span class="n">pipeline_financial</span><span class="p">),</span>
-                <span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span><span class="n">pipeline_email</span><span class="p">),</span>
-        <span class="p">],</span>
-        <span class="n">transformer_weights</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;email_text&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;subjects&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;financial&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-    <span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;Scale&quot;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
-<span class="p">])</span>
-<span class="n">features_transformed</span> <span class="o">=</span> <span class="n">pipeline_union</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-<span class="n">features_transformed</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># Extract labels and features</span>
+<span class="n">labels</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">extract_labels_features</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -17747,23 +17753,14 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[27]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[27]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>array([ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-       -0.21977229, -0.24364097, -0.53886787, -0.3553642 , -0.51678045,
-       -0.53479634, -0.30504293, -0.43947859, -0.31773738, -0.53479634,
-        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-        0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
-        0.        ,  0.        ,  0.        ,  0.        ])</pre>
+<pre>Pipeline(steps=[(&#39;union&#39;, FeatureUnion(n_jobs=1,
+       transformer_list=[(&#39;email_text&#39;, Pipeline(steps=[(&#39;GetEmailText&#39;, SelectMatchFeatures(convert_to_numeric=False, feature_match=&#39;word_.*&#39;)), (&#39;SelectPercentile&#39;, SelectKBest(k=250, score_func=&lt;function chi2 at 0x000000000A43B898&gt;))])), (&#39;subjects&#39;, Pipeli...ttan&#39;,
+           metric_params=None, n_jobs=1, n_neighbors=3, p=2,
+           weights=&#39;distance&#39;))])</pre>
 </div>
 
 </div>
@@ -17772,11 +17769,62 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Features from words from email texts used:</p>
+<h3 id="Reducing-the-number-of-word-features-from-emails">Reducing the number of word features from emails<a class="anchor-link" href="#Reducing-the-number-of-word-features-from-emails">&#182;</a></h3><p>First, the number of word features from emails is reduced by using only the <code>k</code> best feature with respect toa univariate metric. The parameters <code>k</code> (one if [10, 50, 100, 250, 500])and the metric, either ANOVA F-value (<code>f_classif</code>) or chi-squared statisitic (<code>chi2</code>), are taken as hyper parameters. A naive bayes algorithms is then run on the resulting feature set, with the parameters <code>alpha</code> also taken as hyperparameter.</p>
+<p>The results are as following.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th>Rank</th>
+<th>Mean F1 score</th>
+<th>F1 Standard deviation</th>
+<th><code>k</code></th>
+<th><code>score_func</code></th>
+<th><code>alpha</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0.476</td>
+<td>0.238</td>
+<td>500</td>
+<td>irrelevant</td>
+<td>.5</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0.459</td>
+<td>0.091</td>
+<td>250</td>
+<td><code>chi2</code></td>
+<td>.5</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The best F1 score was obtained with all words kept, but since the standard variation is much larger for this setting than for the second ranked setting, I chose to keep the third setting.
+The best 250 words from the email text used for the next step in the classifier are shown below.</p>
 
 </div>
 </div>
@@ -17786,8 +17834,8 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[28]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">email_text_features</span> <span class="o">=</span> <span class="n">pipeline_union</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;GetEmailText&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">()</span>
-<span class="n">select_email_text_features_idx</span> <span class="o">=</span> <span class="n">pipeline_union</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;SelectPercentile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_support</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">email_text_features</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;GetEmailText&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">()</span>
+<span class="n">select_email_text_features_idx</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;SelectPercentile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_support</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="c1">#.fit_transform(features, labels)</span>
 <span class="n">select_email_text_features</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">email_text_features</span><span class="p">,</span> <span class="n">select_email_text_features_idx</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 <span class="n">select_email_text_features</span>
@@ -17801,34 +17849,260 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[28]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[28]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[u&#39;word_profession&#39;,
+<pre>[u&#39;word_barri&#39;,
+ u&#39;word_enjoy&#39;,
+ u&#39;word_delainey&#39;,
+ u&#39;word_adjust&#39;,
+ u&#39;word_contain&#39;,
+ u&#39;word_profession&#39;,
  u&#39;word_chris&#39;,
+ u&#39;word_communicationsenron&#39;,
+ u&#39;word_construct&#39;,
+ u&#39;word_appli&#39;,
+ u&#39;word_vinc&#39;,
+ u&#39;word_public&#39;,
+ u&#39;word_molli&#39;,
+ u&#39;word_measur&#39;,
+ u&#39;word_engin&#39;,
  u&#39;word_ed&#39;,
  u&#39;word_attorney&#39;,
+ u&#39;word_et&#39;,
+ u&#39;word_conduct&#39;,
+ u&#39;word_march&#39;,
+ u&#39;word_employ&#39;,
+ u&#39;word_piec&#39;,
+ u&#39;word_eol&#39;,
+ u&#39;word_nice&#39;,
+ u&#39;word_larri&#39;,
+ u&#39;word_forum&#39;,
+ u&#39;word_student&#39;,
+ u&#39;word_comput&#39;,
+ u&#39;word_luci&#39;,
+ u&#39;word_print&#39;,
+ u&#39;word_martin&#39;,
+ u&#39;word_enw&#39;,
+ u&#39;word_investor&#39;,
+ u&#39;word_gari&#39;,
+ u&#39;word_extern&#39;,
  u&#39;word_slide&#39;,
+ u&#39;word_linda&#39;,
+ u&#39;word_load&#39;,
+ u&#39;word_compens&#39;,
+ u&#39;word_law&#39;,
+ u&#39;word_hill&#39;,
+ u&#39;word_dasovich&#39;,
+ u&#39;word_folder&#39;,
+ u&#39;word_cindi&#39;,
+ u&#39;word_design&#39;,
+ u&#39;word_commiss&#39;,
+ u&#39;word_peter&#39;,
+ u&#39;word_flight&#39;,
+ u&#39;word_crude&#39;,
+ u&#39;word_sunday&#39;,
+ u&#39;word_aa&#39;,
+ u&#39;word_partnership&#39;,
+ u&#39;word_regul&#39;,
+ u&#39;word_live&#39;,
+ u&#39;word_attende&#39;,
+ u&#39;word_apolog&#39;,
+ u&#39;word_jan&#39;,
+ u&#39;word_index&#39;,
+ u&#39;word_commoditylog&#39;,
+ u&#39;word_guess&#39;,
+ u&#39;word_laura&#39;,
+ u&#39;word_jay&#39;,
+ u&#39;word_quot&#39;,
+ u&#39;word_facilit&#39;,
+ u&#39;word_hous&#39;,
+ u&#39;word_accomplish&#39;,
+ u&#39;word_curv&#39;,
+ u&#39;word_bruce&#39;,
+ u&#39;word_stinson&#39;,
+ u&#39;word_physic&#39;,
+ u&#39;word_core&#39;,
+ u&#39;word_administr&#39;,
+ u&#39;word_glad&#39;,
  u&#39;word_assess&#39;,
+ u&#39;word_password&#39;,
+ u&#39;word_pge&#39;,
+ u&#39;word_chief&#39;,
  u&#39;word_onlin&#39;,
+ u&#39;word_vote&#39;,
+ u&#39;word_lng&#39;,
+ u&#39;word_hello&#39;,
+ u&#39;word_alan&#39;,
  u&#39;word_american&#39;,
+ u&#39;word_cent&#39;,
+ u&#39;word_phase&#39;,
+ u&#39;word_citi&#39;,
+ u&#39;word_bonus&#39;,
+ u&#39;word_fuel&#39;,
+ u&#39;word_chart&#39;,
+ u&#39;word_exchang&#39;,
+ u&#39;word_incorpor&#39;,
+ u&#39;word_doorstep&#39;,
+ u&#39;word_wife&#39;,
+ u&#39;word_christma&#39;,
+ u&#39;word_feder&#39;,
+ u&#39;word_love&#39;,
+ u&#39;word_vp&#39;,
+ u&#39;word_oil&#39;,
+ u&#39;word_aep&#39;,
+ u&#39;word_south&#39;,
  u&#39;word_dedic&#39;,
+ u&#39;word_dpr&#39;,
+ u&#39;word_perhap&#39;,
+ u&#39;word_lexi&#39;,
  u&#39;word_agenda&#39;,
+ u&#39;word_promot&#39;,
+ u&#39;word_shankman&#39;,
+ u&#39;word_vice&#39;,
+ u&#39;word_voicemail&#39;,
  u&#39;word_knowledg&#39;,
+ u&#39;word_talent&#39;,
  u&#39;word_commod&#39;,
+ u&#39;word_common&#39;,
  u&#39;word_match&#39;,
+ u&#39;word_surpris&#39;,
+ u&#39;word_doug&#39;,
+ u&#39;word_rememb&#39;,
+ u&#39;word_counsel&#39;,
+ u&#39;word_lavo&#39;,
+ u&#39;word_egm&#39;,
+ u&#39;word_investig&#39;,
+ u&#39;word_jame&#39;,
+ u&#39;word_record&#39;,
+ u&#39;word_lose&#39;,
+ u&#39;word_ut&#39;,
+ u&#39;word_wonder&#39;,
+ u&#39;word_japan&#39;,
+ u&#39;word_tonight&#39;,
+ u&#39;word_rotat&#39;,
+ u&#39;word_formal&#39;,
+ u&#39;word_west&#39;,
+ u&#39;word_wouldnt&#39;,
+ u&#39;word_regist&#39;,
+ u&#39;word_histor&#39;,
+ u&#39;word_school&#39;,
+ u&#39;word_havent&#39;,
+ u&#39;word_card&#39;,
+ u&#39;word_haedickehouectect&#39;,
+ u&#39;word_depart&#39;,
+ u&#39;word_trader&#39;,
+ u&#39;word_netco&#39;,
+ u&#39;word_belden&#39;,
+ u&#39;word_depend&#39;,
+ u&#39;word_campaign&#39;,
  u&#39;word_sherri&#39;,
- u&#39;word_applic&#39;,
+ u&#39;word_dad&#39;,
+ u&#39;word_platform&#39;,
+ u&#39;word_outstand&#39;,
+ u&#39;word_reduct&#39;,
+ u&#39;word_polit&#39;,
+ u&#39;word_kim&#39;,
+ u&#39;word_princip&#39;,
+ u&#39;word_ventur&#39;,
+ u&#39;word_gp&#39;,
+ u&#39;word_ongo&#39;,
+ u&#39;word_iso&#39;,
+ u&#39;word_practic&#39;,
+ u&#39;word_roll&#39;,
+ u&#39;word_voic&#39;,
+ u&#39;word_sarah&#39;,
  u&#39;word_push&#39;,
+ u&#39;word_avoid&#39;,
+ u&#39;word_advantag&#39;,
+ u&#39;word_philipp&#39;,
+ u&#39;word_ben&#39;,
+ u&#39;word_player&#39;,
+ u&#39;word_studi&#39;,
+ u&#39;word_strateg&#39;,
+ u&#39;word_metal&#39;,
+ u&#39;word_india&#39;,
+ u&#39;word_mr&#39;,
+ u&#39;word_user&#39;,
+ u&#39;word_survey&#39;,
+ u&#39;word_mm&#39;,
+ u&#39;word_smith&#39;,
+ u&#39;word_weather&#39;,
+ u&#39;word_favor&#39;,
+ u&#39;word_hire&#39;,
+ u&#39;word_hpl&#39;,
+ u&#39;word_followup&#39;,
+ u&#39;word_field&#39;,
+ u&#39;word_kathi&#39;,
+ u&#39;word_synchron&#39;,
+ u&#39;word_appar&#39;,
+ u&#39;word_saudi&#39;,
+ u&#39;word_shall&#39;,
+ u&#39;word_street&#39;,
+ u&#39;word_section&#39;,
+ u&#39;word_publish&#39;,
+ u&#39;word_spread&#39;,
+ u&#39;word_dale&#39;,
+ u&#39;word_conflict&#39;,
+ u&#39;word_rice&#39;,
+ u&#39;word_closer&#39;,
  u&#39;word_delet&#39;,
  u&#39;word_wes&#39;,
+ u&#39;word_austin&#39;,
+ u&#39;word_word&#39;,
+ u&#39;word_nation&#39;,
+ u&#39;word_peak&#39;,
+ u&#39;word_kean&#39;,
+ u&#39;word_tx&#39;,
+ u&#39;word_descript&#39;,
+ u&#39;word_ub&#39;,
+ u&#39;word_jeffrey&#39;,
+ u&#39;word_famili&#39;,
+ u&#39;word_applic&#39;,
+ u&#39;word_enrononlin&#39;,
  u&#39;word_ann&#39;,
- u&#39;word_calger&#39;]</pre>
+ u&#39;word_ii&#39;,
+ u&#39;word_campus&#39;,
+ u&#39;word_task&#39;,
+ u&#39;word_todd&#39;,
+ u&#39;word_promis&#39;,
+ u&#39;word_cap&#39;,
+ u&#39;word_car&#39;,
+ u&#39;word_train&#39;,
+ u&#39;word_noon&#39;,
+ u&#39;word_especi&#39;,
+ u&#39;word_intent&#39;,
+ u&#39;word_keannaenronenron&#39;,
+ u&#39;word_argument&#39;,
+ u&#39;word_spent&#39;,
+ u&#39;word_portland&#39;,
+ u&#39;word_don&#39;,
+ u&#39;word_cathi&#39;,
+ u&#39;word_calcul&#39;,
+ u&#39;word_transport&#39;,
+ u&#39;word_saturday&#39;,
+ u&#39;word_pl&#39;,
+ u&#39;word_ps&#39;,
+ u&#39;word_px&#39;,
+ u&#39;word_session&#39;,
+ u&#39;word_shirley&#39;,
+ u&#39;word_deriv&#39;,
+ u&#39;word_var&#39;,
+ u&#39;word_basic&#39;,
+ u&#39;word_coal&#39;,
+ u&#39;word_vacat&#39;,
+ u&#39;word_valuat&#39;,
+ u&#39;word_rod&#39;,
+ u&#39;word_rob&#39;,
+ u&#39;word_tel&#39;,
+ u&#39;word_notifi&#39;,
+ u&#39;word_profit&#39;,
+ u&#39;word_impress&#39;,
+ u&#39;word_video&#39;,
+ u&#39;word_maureen&#39;,
+ u&#39;word_calger&#39;,
+ u&#39;word_anticip&#39;]</pre>
 </div>
 
 </div>
@@ -17837,7 +18111,8 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -17846,11 +18121,68 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Features from email subjects used:</p>
+<h3 id="Reducing-the-number-of-subject-feauters">Reducing the number of subject feauters<a class="anchor-link" href="#Reducing-the-number-of-subject-feauters">&#182;</a></h3><p>The subject features are treated in the same way as the email word features. For the <code>k</code> the following settings have been tested: [2, 3, 5, 10, 100, 200]. The top three results are shown below.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th>Rank</th>
+<th>Mean F1 score</th>
+<th>F1 Standard deviation</th>
+<th><code>k</code></th>
+<th><code>score_func</code></th>
+<th><code>alpha</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0.392</td>
+<td>0.301</td>
+<td>100</td>
+<td><code>f_classif</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0.388</td>
+<td>0.259</td>
+<td>100</td>
+<td><code>chi2</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0.384</td>
+<td>0.430</td>
+<td>10</td>
+<td><code>chi2</code></td>
+<td>.5, .8, 1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Again, since the standard deviation for the second ranked setting is significantly smaller and the mean value is only slightly smaller, I chose the keep this setting for the next steps. The features from email subjects used are listed below.</p>
 
 </div>
 </div>
@@ -17860,8 +18192,8 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[29]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">sub_features</span> <span class="o">=</span> <span class="n">pipeline_union</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;GetEmailText&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">()</span>
-<span class="n">select_sub_features_idx</span> <span class="o">=</span> <span class="n">pipeline_union</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;SelectPercentile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_support</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">sub_features</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;GetEmailText&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">()</span>
+<span class="n">select_sub_features_idx</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;SelectPercentile&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_support</span><span class="p">(</span><span class="n">indices</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="c1">#.fit_transform(features, labels)</span>
 <span class="n">select_sub_features</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">sub_features</span><span class="p">,</span> <span class="n">select_sub_features_idx</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 <span class="n">select_sub_features</span>
@@ -17875,24 +18207,110 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[29]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[29]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[u&#39;sub_to_ene friday peer group report&#39;,
+<pre>[u&#39;sub_from_follow up&#39;,
+ u&#39;sub_to_2000 ena offsite&#39;,
+ u&#39;sub_from_hiring practices for summer interns&#39;,
+ u&#39;sub_from_cgas&#39;,
+ u&#39;sub_from_congrats&#39;,
+ u&#39;sub_from_summer internship&#39;,
+ u&#39;sub_to_netco&#39;,
+ u&#39;sub_from_houston we have a problem&#39;,
+ u&#39;sub_to_enrononline executive summary  for june 04 2001&#39;,
+ u&#39;sub_to_ene friday peer group report&#39;,
+ u&#39;sub_to_enrononline executive summary for december 12 2000&#39;,
+ u&#39;sub_to_ena management committee&#39;,
+ u&#39;sub_to_expenditures with minoritywomen owned business enterprises through&#39;,
+ u&#39;sub_from_draft of organizational announcement&#39;,
+ u&#39;sub_from_your approval is requested&#39;,
+ u&#39;sub_to_online trading simulation&#39;,
+ u&#39;sub_from_egm business presentation&#39;,
+ u&#39;sub_to_briefing paper fercs june 19 westwide price mitigation order&#39;,
+ u&#39;sub_from_followup&#39;,
+ u&#39;sub_from_global risk management operations&#39;,
+ u&#39;sub_from_weekly report&#39;,
+ u&#39;sub_to_enron mentions&#39;,
  u&#39;sub_from_organizational announcement&#39;,
  u&#39;sub_to_government affairs organizational changes&#39;,
+ u&#39;sub_from_enron mentions&#39;,
+ u&#39;sub_from_super saturday june 3 2000&#39;,
+ u&#39;sub_to_dpr reporting&#39;,
  u&#39;sub_to_policy committee review  analystassociate program prc process&#39;,
+ u&#39;sub_from_hi&#39;,
+ u&#39;sub_to_sa memo  revised&#39;,
+ u&#39;sub_from_rotation&#39;,
+ u&#39;sub_to_enrononline management report for may 11 2001&#39;,
  u&#39;sub_to_executive committee meeting  monday september 25&#39;,
+ u&#39;sub_from_fyi&#39;,
+ u&#39;sub_from_resume&#39;,
  u&#39;sub_to_executive committee meeting  monday october 16  new sec rules&#39;,
+ u&#39;sub_to_vice president recommendation&#39;,
+ u&#39;sub_from_spring 2001 conference participation by jeffrey k skilling&#39;,
+ u&#39;sub_to_annual compliance meeting&#39;,
+ u&#39;sub_from_update&#39;,
+ u&#39;sub_to_enw holiday party online invitation&#39;,
+ u&#39;sub_to_enrononline management report for may 25 2001&#39;,
+ u&#39;sub_to_management committee offsite&#39;,
+ u&#39;sub_from_freight weekly report&#39;,
  u&#39;sub_to_la times article&#39;,
+ u&#39;sub_to_whalleys budget meeting  612&#39;,
+ u&#39;sub_to_invitation&#39;,
+ u&#39;sub_to_peer group mapping&#39;,
+ u&#39;sub_to_dpr reporting  update on timing&#39;,
+ u&#39;sub_from_meeting with governor davis need for additional&#39;,
+ u&#39;sub_from_no subject&#39;,
+ u&#39;sub_to_midyear 2000 performance review process&#39;,
  u&#39;sub_to_rac website  portfolio tracking system&#39;,
+ u&#39;sub_to_enrononline management report  for june 01 2001&#39;,
+ u&#39;sub_from_2001 goals&#39;,
+ u&#39;sub_to_enron net works holiday party reminder&#39;,
+ u&#39;sub_to_mid year prc dates&#39;,
+ u&#39;sub_to_hpl status&#39;,
+ u&#39;sub_to_leaving soon&#39;,
+ u&#39;sub_from_uk submission of positions&#39;,
+ u&#39;sub_from_lunch&#39;,
+ u&#39;sub_from_promotion&#39;,
+ u&#39;sub_to_thank you&#39;,
+ u&#39;sub_to_mdvp titling guidline&#39;,
+ u&#39;sub_from_western wholesale activities  gas  power conf call&#39;,
+ u&#39;sub_to_weekly regulatory and government affairs report&#39;,
+ u&#39;sub_to_executive committee invitation  holiday open house 1219&#39;,
+ u&#39;sub_to_crude 24x7 wti marketing effort&#39;,
+ u&#39;sub_to_energy issues&#39;,
+ u&#39;sub_to_im leaving enron&#39;,
+ u&#39;sub_to_weekly government affairs report&#39;,
+ u&#39;sub_to_california assembly releases modified mou for edison&#39;,
+ u&#39;sub_from_golf&#39;,
+ u&#39;sub_from_2000 ena offsite&#39;,
  u&#39;sub_to_advisory council presentations&#39;,
- u&#39;sub_to_enron advisory council presentations&#39;]</pre>
+ u&#39;sub_from_the stage&#39;,
+ u&#39;sub_to_recommendation of carol hensley&#39;,
+ u&#39;sub_from_approval for reviewer&#39;,
+ u&#39;sub_from_eol&#39;,
+ u&#39;sub_from_invitation&#39;,
+ u&#39;sub_from_confidential&#39;,
+ u&#39;sub_to_bcp seat assignments&#39;,
+ u&#39;sub_to_erv notification  violationnotification memo  10252001&#39;,
+ u&#39;sub_to_enron advisory council presentations&#39;,
+ u&#39;sub_to_management committee meeting  monday november 26&#39;,
+ u&#39;sub_from_visit&#39;,
+ u&#39;sub_from_for immediate review agreement restricting power generation&#39;,
+ u&#39;sub_to_enrononline executive summary for may 31 2001&#39;,
+ u&#39;sub_from_dabhol  a brief legal update&#39;,
+ u&#39;sub_to_update  executive committee list&#39;,
+ u&#39;sub_from_jblock&#39;,
+ u&#39;sub_from_thank you&#39;,
+ u&#39;sub_from_thanks&#39;,
+ u&#39;sub_to_egm business presentation&#39;,
+ u&#39;sub_from_restartintegration planning&#39;,
+ u&#39;sub_from_ou&#39;,
+ u&#39;sub_to_california  march 9 order addressing refunds for jan\t2001&#39;,
+ u&#39;sub_from_vacation&#39;,
+ u&#39;sub_to_enrononline executive summary for june 06 2001&#39;,
+ u&#39;sub_from_test&#39;]</pre>
 </div>
 
 </div>
@@ -17901,11 +18319,12 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Counting financial features used:</p>
+<p>Financials features are used as provided excepts thos whith many missing values as stated above.</p>
 
 </div>
 </div>
@@ -17915,7 +18334,7 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[30]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fin_features</span> <span class="o">=</span> <span class="n">pipeline_union</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;ConvertToVector&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">()</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fin_features</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;ConvertToVector&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">()</span>
 <span class="n">fin_features</span>
 </pre></div>
 
@@ -17927,11 +18346,7 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[30]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[30]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -17952,11 +18367,12 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Counting email count features used:</p>
+<p>Counting email features are used as provided.</p>
 
 </div>
 </div>
@@ -17966,7 +18382,7 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[31]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">email_features</span> <span class="o">=</span> <span class="n">pipeline_union</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;ConvertToVector&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">()</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">email_features</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;union&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transformer_list</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;ConvertToVector&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">()</span>
 <span class="n">email_features</span>
 </pre></div>
 
@@ -17978,11 +18394,7 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[31]:</div>
-
-
+<div class="output_area"><div class="prompt output_prompt">Out[31]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -17999,216 +18411,309 @@ UuEMAkkqnEEgSYUzCCSpcP8f3iAtV94irbMAAAAASUVORK5CYII=
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Results">Results<a class="anchor-link" href="#Results">&#194;&#182;</a></h2>
+<h2 id="Feature-scaling-and-transformation">Feature scaling and transformation<a class="anchor-link" href="#Feature-scaling-and-transformation">&#182;</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Neglecting financial and email word feature gave better results. Therefore, those features are excluded in the model.</p>
-<p>After extracting the features from the dictionary, missing values are replaced by respective medians. Than, email counting and financial features are transformed to a logarithmic scale. From the subject features the 10 features with the best separating power for the training sample are selected. After that all the features are combined scaled to mean 0 and unit variance.</p>
-<p>Since the data is dominated by Non-POIs, the accuracy might not be the best measure for the performance, since always assuming false (i.e. the respective employee is a non-POI) already results in an accuracy of 83%. Therefore, I chose to score the models based on the F1 score for the positive , i.e. POI, class. The F1 score is average of precision and recall.</p>
-<p>According to the <a href="http://scikit-learn.org/stable/tutorial/machine_learning_map/index.html">scikit learn flow chart</a> I decided to test the following three classification ML-algorithms:</p>
-<ol>
-<li>Support Vector Classification (SVC)</li>
-<li>k-Nearest Neighbors Classification (kNN)</li>
-<li>Random Forest Classification (RF)</li>
-</ol>
-<p>At first, I tested every possible combination of the four subset of features giving a total of $2^4-1=15$ (1 is subtracted because using no features at all is senseless) combinations with the default settings defined by the scikit learn package of each classifier.</p>
-<p>The best combination of features for each classifier are given in the following table</p>
+<p>After extracting the features from the dictionary, missing valuesin the financial features are replaced by zero. Than, email counting and financial features are transformed to a logarithmic scale. From the subject features the selected 100 features with the best Chi square stats for the training sample are selected. The same is done for the email word features, only that 250 features are used. In addition to that, it is tested whether a chained estimator is helpful, i.e. if the performance increases if a separate naive bayes classifier is run email words and subjects features and only the result of this estimator is forwarded as a single feature to the final classifiert.</p>
+<p>After that all the features are combined scaled to mean 0 and unit variance.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Feature-union-selection">Feature union selection<a class="anchor-link" href="#Feature-union-selection">&#182;</a></h2><p>After the reduction of features, it is tested which combination of group of features, email words, subject lines, financial and email count, give the best results. I also tested whether the chained naive bayes classifier for subject and email word features increaeses the performance. The following flow charts gives an overview about the feature selection and feature union processesing.</p>
+<p><img src="img/Flow chart feature selection.png" alt="Flow chart feature selection"></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I tested every possible combination of the four subset of features giving a total of $3 \times 3 \times 2 \times 2 -1=35$ (1 is subtracted because using no features at all is senseless) combinations with the default settings defined by the scikit learn package of each classifier.</p>
+<p>The best combination of features for each classifier are given in the following table. NB indicated that the feature was used after being put through a Naive Bayes classifier.</p>
 <table>
 <thead><tr>
 <th>Classifier</th>
-<th>Best Feature Combination</th>
+<th>Email word features</th>
+<th>Subject features</th>
+<th>Financial feauters</th>
+<th>Email count features</th>
 <th>Mean F1-Score</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>SVC</td>
-<td>Only subject features</td>
-<td>0.504 (std: 0.418)</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>0.428 (std: 0.341)</td>
 </tr>
 <tr>
 <td>kNN</td>
-<td>Only subject features</td>
-<td>0.333 (std: 0.416)</td>
+<td>No</td>
+<td>Yes (NB)</td>
+<td>No</td>
+<td>Yes</td>
+<td>0.412 (std: 0.172)</td>
 </tr>
 <tr>
 <td>RF</td>
-<td>Only subject features</td>
-<td>0.283 (std: 0.360)</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>0.252 (std: 0.308)</td>
 </tr>
 </tbody>
 </table>
-<p>Since all three algorithms selected the same combination of features, which is in fact no combination but only the subset of the created subject feature set, this is chosen for the hyper-parameter tuning of each classifier.</p>
-<p>In the following lines, the respective optimal found hyper-parameter setting is given with the some performance measures of this optimal setting obtained by running a stratified cross-validation. In case two different parameter setting resulted in the same score, both settings are listed.</p>
-<p>A Grid search for hyper parameter tuning revealed that the best settings for the final random forest classifier is shown in the following table.</p>
-<table>
-<thead><tr>
-<th>Parameter</th>
-<th>Best setting found</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>min_samples_leaf</td>
-<td>1</td>
-</tr>
-<tr>
-<td>n_estimators</td>
-<td>10</td>
-</tr>
-<tr>
-<td>min_samples_split</td>
-<td>6</td>
-</tr>
-</tbody>
-</table>
+<p>For all classifiers, the best combination neglects the email word features, therefore email word features are neglected in the following. 
+Except for the kNN, which uses only the output from the naive bayes classifier on the subject feature all classifiers suffer from overtraining as it is obvious from the large standard deviations.
+The final decision on the final feature subset has to be post-poned after hyper-parameter tuning.</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Hyper-parameter-tuning-and-model-selection">Hyper-parameter tuning and model selection<a class="anchor-link" href="#Hyper-parameter-tuning-and-model-selection">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For each of the three selected classifiers, different settings for hyper parameters are tested. Hyper parameters have to be tuned in order</p>
+<ul>
+<li>to obtain the best possible results and </li>
+<li>to reduce effects of overfitting.</li>
+</ul>
+<p>E.g., it will be shown, that the performance of the random forest can be improved by 69 % through tuning of the hyper-parameters.</p>
+<p>Here, a grid search probing many different parameter sets has been implemented. The following parameters are checked for the various classifiers.</p>
+<p><strong>RF</strong></p>
+<table>
+<thead><tr>
+<th>Parameter</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>min_samples_leaf</code></td>
+<td>1, 2, 4</td>
+</tr>
+<tr>
+<td><code>n_estimators</code></td>
+<td>5, 10, 20</td>
+</tr>
+<tr>
+<td><code>min_samples_split</code></td>
+<td>2, 4, 6</td>
+</tr>
+</tbody>
+</table>
 <p><strong>SVC</strong></p>
 <table>
 <thead><tr>
 <th>Parameter</th>
-<th>Best setting found</th>
+<th>Values</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>class_weight</td>
-<td>None</td>
+<td><code>class_weight</code></td>
+<td>None, <code>'balanced'</code></td>
 </tr>
 <tr>
-<td>kernel</td>
-<td><code>rbf</code></td>
+<td><code>kernel</code></td>
+<td><code>'rbf'</code>, <code>'sigmoid'</code>, <code>'linear'</code></td>
 </tr>
 <tr>
-<td>C</td>
-<td>0.8 or 1</td>
+<td><code>C</code></td>
+<td>.2, .5, .8, 1</td>
 </tr>
 </tbody>
 </table>
-<p>Mean validation score: 0.504 (std: 0.418)</p>
-
-<pre><code>             precision    recall  f1-score   support
-
-      False       0.90      0.96      0.93        72
-       True       0.67      0.43      0.52        14
-
-avg / total       0.86      0.87      0.86        86
-
-Accuracy:  0.872093023256</code></pre>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>KNeighborsClassifier</strong></p>
+<p><strong>kNN</strong></p>
 <table>
 <thead><tr>
 <th>Parameter</th>
-<th>Best setting found</th>
+<th>Values</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>n_neighbors</td>
-<td>1</td>
+<td><code>n_neighbors</code></td>
+<td>1, 3, 5</td>
 </tr>
 <tr>
-<td>metric</td>
-<td><code>manhattan</code></td>
+<td><code>metric</code></td>
+<td><code>'manhattan'</code>,  <code>'minkowski'</code></td>
 </tr>
 <tr>
-<td>weights</td>
-<td><code>uniform</code> or <code>distance</code></td>
+<td><code>weights</code></td>
+<td><code>'uniform'</code>, <code>'distance'</code></td>
 </tr>
 </tbody>
 </table>
-<p>Mean validation score: 0.516 (std: 0.386)</p>
-
-<pre><code>             precision    recall  f1-score   support
-
-      False       0.90      0.92      0.91        72
-       True       0.54      0.50      0.52        14
-
-avg / total       0.84      0.85      0.85        86
-
-Accuracy:  0.848837209302</code></pre>
+<p>In addition to this all subsets of features are probed including the chained naive bayes classifier for the subject features.</p>
+<p>The results for each classifier are shown in this table.</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>RandomForestClassifier</strong></p>
 <table>
 <thead><tr>
-<th>Parameter</th>
-<th>Best setting found</th>
+<th>Classifier</th>
+<th>Subject</th>
+<th>Financial</th>
+<th>Email count</th>
+<th>Parameter 1</th>
+<th>Setting</th>
+<th>Parameter 2</th>
+<th>Setting</th>
+<th>Parameter 3</th>
+<th>Setting</th>
+<th>F1 Score</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>min_samples_leaf</td>
+<td>RF</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td><code>min_samples_leaf</code></td>
 <td>1</td>
+<td><code>n_estimators</code></td>
+<td>20</td>
+<td><code>min_samples_split</code></td>
+<td>2</td>
+<td>0.426 (std: 0.442)</td>
 </tr>
 <tr>
-<td>n_estimators</td>
-<td>5</td>
+<td>SVC</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td><code>class_weight</code></td>
+<td><code>"balanced"</code></td>
+<td><code>kernel</code></td>
+<td><code>"linear"</code></td>
+<td><code>C</code></td>
+<td>0.8, 1.0</td>
+<td>0.492 (std: 0.107)</td>
 </tr>
 <tr>
-<td>min_samples_split</td>
-<td>6</td>
+<td>kNN</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes/No</td>
+<td><code>n_neighbors</code></td>
+<td>3</td>
+<td><code>metric</code></td>
+<td><code>"manhattan"</code></td>
+<td><code>weights</code></td>
+<td><code>"distance"</code></td>
+<td>0.521 (std: 0.388)</td>
 </tr>
 </tbody>
 </table>
-<p>Mean validation score: 0.442 (std: 0.392)</p>
-
-<pre><code>             precision    recall  f1-score   support
-
-      False       0.88      0.93      0.91        72
-       True       0.50      0.36      0.42        14
-
-avg / total       0.82      0.84      0.83        86
-
-Accuracy:  0.837209302326</code></pre>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The result is that k-nearest neighbors classifier performs best with respect to the F1 score and also for the standard deviation for this score for the POI class. At average 54% of the employees classified as POIs are POIs indeed and 50% of POIs are found. The mean of this two figures is the F1 score of 52%.</p>
+<p>The optimal result is achieved by the kNN classifier with subject features with or without email count features. A little smaller score but with much smaller standard deviation is achieved by the SVC using only the email count features.</p>
+<p>The RF classifier's score improved by 69% when compared to the result with the default parameter set. Also, the SVC and kNN classifier's performances benefit from tuned parameters though less than the RF classifier.</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Feature-importance">Feature importance<a class="anchor-link" href="#Feature-importance">&#194;&#182;</a></h3><p>To get a feeling about the feature importance a random forest classifier is trained on the complete data set. The resulting feature importance is given in the table below.</p>
+<p>The following table gives the result for precision, recall and F1 score for all classes (POI, non-POI) for the best found kNN classifier.</p>
+<table>
+<thead><tr>
+<th>class</th>
+<th>precision</th>
+<th>recall</th>
+<th>f1-score</th>
+<th>support</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>False</td>
+<td>0.91</td>
+<td>0.96</td>
+<td>0.93</td>
+<td>72</td>
+</tr>
+<tr>
+<td>True</td>
+<td>0.70</td>
+<td>0.50</td>
+<td>0.58</td>
+<td>14</td>
+</tr>
+<tr>
+<td><strong>avg / total</strong></td>
+<td>0.87</td>
+<td>0.88</td>
+<td>0.88</td>
+<td>86</td>
+</tr>
+</tbody>
+</table>
+<p>At average 70% of the employees classified as POIs are POIs indeed and 50% of POIs are found. The results in an F1 score of 58%.</p>
+<p>The accuracy of this classifier is 88.4 %.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="List-of-final-selected-features">List of final selected features<a class="anchor-link" href="#List-of-final-selected-features">&#182;</a></h3><p>Since the best performing algorithm is the kNN with just the subject features only the following features are used.</p>
 
 </div>
 </div>
@@ -18218,14 +18723,8 @@ Accuracy:  0.837209302326</code></pre>
 <div class="prompt input_prompt">In&nbsp;[32]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
-
-<span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">class_weight</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features_transformed</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-<span class="c1">#clf.feature_importances_</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">feature_importances_</span><span class="p">,</span>
-             <span class="n">index</span><span class="o">=</span><span class="n">select_email_text_features</span> <span class="o">+</span> <span class="n">select_sub_features</span> <span class="o">+</span> <span class="n">fin_features</span> <span class="o">+</span> <span class="n">email_features</span><span class="p">,</span>
-             <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Importance&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;Importance&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">feature_list</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;my_feature_list.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">))</span>
+<span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">feature_list</span> <span class="k">if</span> <span class="n">item</span> <span class="o">!=</span> <span class="s2">&quot;poi&quot;</span><span class="p">]</span>
 </pre></div>
 
 </div>
@@ -18236,108 +18735,200 @@ Accuracy:  0.837209302326</code></pre>
 <div class="output">
 
 
-<div class="output_area">
-
-<div class="prompt output_prompt">Out[32]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[32]:</div>
 
 
+<div class="output_text output_subarea output_execute_result">
+<pre>[u&#39;sub_from_follow up&#39;,
+ u&#39;sub_to_2000 ena offsite&#39;,
+ u&#39;sub_from_hiring practices for summer interns&#39;,
+ u&#39;sub_from_cgas&#39;,
+ u&#39;sub_from_congrats&#39;,
+ u&#39;sub_from_summer internship&#39;,
+ u&#39;sub_to_netco&#39;,
+ u&#39;sub_from_houston we have a problem&#39;,
+ u&#39;sub_to_enrononline executive summary  for june 04 2001&#39;,
+ u&#39;sub_to_ene friday peer group report&#39;,
+ u&#39;sub_to_enrononline executive summary for december 12 2000&#39;,
+ u&#39;sub_to_ena management committee&#39;,
+ u&#39;sub_to_expenditures with minoritywomen owned business enterprises through&#39;,
+ u&#39;sub_from_draft of organizational announcement&#39;,
+ u&#39;sub_from_your approval is requested&#39;,
+ u&#39;sub_to_online trading simulation&#39;,
+ u&#39;sub_from_egm business presentation&#39;,
+ u&#39;sub_to_briefing paper fercs june 19 westwide price mitigation order&#39;,
+ u&#39;sub_from_followup&#39;,
+ u&#39;sub_from_global risk management operations&#39;,
+ u&#39;sub_from_weekly report&#39;,
+ u&#39;sub_to_enron mentions&#39;,
+ u&#39;sub_to_government affairs organizational changes&#39;,
+ u&#39;sub_to_california assembly releases modified mou for edison&#39;,
+ u&#39;sub_from_enron mentions&#39;,
+ u&#39;sub_from_super saturday june 3 2000&#39;,
+ u&#39;sub_to_dpr reporting&#39;,
+ u&#39;sub_to_policy committee review  analystassociate program prc process&#39;,
+ u&#39;sub_from_hi&#39;,
+ u&#39;sub_to_sa memo  revised&#39;,
+ u&#39;sub_from_rotation&#39;,
+ u&#39;sub_to_enrononline management report for may 11 2001&#39;,
+ u&#39;sub_to_executive committee meeting  monday september 25&#39;,
+ u&#39;sub_from_fyi&#39;,
+ u&#39;sub_from_resume&#39;,
+ u&#39;sub_to_executive committee meeting  monday october 16  new sec rules&#39;,
+ u&#39;sub_to_vice president recommendation&#39;,
+ u&#39;sub_to_crude 24x7 wti marketing effort&#39;,
+ u&#39;sub_from_spring 2001 conference participation by jeffrey k skilling&#39;,
+ u&#39;sub_to_annual compliance meeting&#39;,
+ u&#39;sub_from_update&#39;,
+ u&#39;sub_to_enw holiday party online invitation&#39;,
+ u&#39;sub_to_enrononline management report for may 25 2001&#39;,
+ u&#39;sub_to_management committee offsite&#39;,
+ u&#39;sub_from_approval for reviewer&#39;,
+ u&#39;sub_from_freight weekly report&#39;,
+ u&#39;sub_to_la times article&#39;,
+ u&#39;sub_to_whalleys budget meeting  612&#39;,
+ u&#39;sub_from_meeting with governor davis need for additional&#39;,
+ u&#39;sub_to_invitation&#39;,
+ u&#39;sub_to_peer group mapping&#39;,
+ u&#39;sub_to_dpr reporting  update on timing&#39;,
+ u&#39;sub_from_no subject&#39;,
+ u&#39;sub_to_midyear 2000 performance review process&#39;,
+ u&#39;sub_to_rac website  portfolio tracking system&#39;,
+ u&#39;sub_to_enrononline management report  for june 01 2001&#39;,
+ u&#39;sub_from_2001 goals&#39;,
+ u&#39;sub_to_enron net works holiday party reminder&#39;,
+ u&#39;sub_to_mid year prc dates&#39;,
+ u&#39;sub_to_hpl status&#39;,
+ u&#39;sub_to_leaving soon&#39;,
+ u&#39;sub_from_uk submission of positions&#39;,
+ u&#39;sub_from_lunch&#39;,
+ u&#39;sub_from_promotion&#39;,
+ u&#39;sub_to_thank you&#39;,
+ u&#39;sub_to_mdvp titling guidline&#39;,
+ u&#39;sub_from_western wholesale activities  gas  power conf call&#39;,
+ u&#39;sub_to_weekly regulatory and government affairs report&#39;,
+ u&#39;sub_to_executive committee invitation  holiday open house 1219&#39;,
+ u&#39;sub_to_energy issues&#39;,
+ u&#39;sub_to_im leaving enron&#39;,
+ u&#39;sub_to_weekly government affairs report&#39;,
+ u&#39;sub_from_golf&#39;,
+ u&#39;sub_from_2000 ena offsite&#39;,
+ u&#39;sub_to_advisory council presentations&#39;,
+ u&#39;sub_from_the stage&#39;,
+ u&#39;sub_to_recommendation of carol hensley&#39;,
+ u&#39;sub_from_eol&#39;,
+ u&#39;sub_from_invitation&#39;,
+ u&#39;sub_from_confidential&#39;,
+ u&#39;sub_to_bcp seat assignments&#39;,
+ u&#39;sub_to_erv notification  violationnotification memo  10252001&#39;,
+ u&#39;sub_to_enron advisory council presentations&#39;,
+ u&#39;sub_to_management committee meeting  monday november 26&#39;,
+ u&#39;sub_from_visit&#39;,
+ u&#39;sub_from_for immediate review agreement restricting power generation&#39;,
+ u&#39;sub_to_enrononline executive summary for may 31 2001&#39;,
+ u&#39;sub_from_dabhol  a brief legal update&#39;,
+ u&#39;sub_from_organizational announcement&#39;,
+ u&#39;sub_to_update  executive committee list&#39;,
+ u&#39;sub_from_jblock&#39;,
+ u&#39;sub_from_thank you&#39;,
+ u&#39;sub_from_thanks&#39;,
+ u&#39;sub_to_egm business presentation&#39;,
+ u&#39;sub_from_restartintegration planning&#39;,
+ u&#39;sub_from_ou&#39;,
+ u&#39;sub_to_california  march 9 order addressing refunds for jan\t2001&#39;,
+ u&#39;sub_from_vacation&#39;,
+ u&#39;sub_to_enrononline executive summary for june 06 2001&#39;,
+ u&#39;sub_from_test&#39;]</pre>
+</div>
 
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style>
-    .dataframe thead tr:only-child th {
-        text-align: right;
-    }
+</div>
 
-    .dataframe thead th {
-        text-align: left;
-    }
+</div>
+</div>
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Importance</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>sub_from_organizational announcement</th>
-      <td>0.186099</td>
-    </tr>
-    <tr>
-      <th>sub_to_advisory council presentations</th>
-      <td>0.161314</td>
-    </tr>
-    <tr>
-      <th>sub_to_government affairs organizational changes</th>
-      <td>0.145229</td>
-    </tr>
-    <tr>
-      <th>sub_to_ene friday peer group report</th>
-      <td>0.102786</td>
-    </tr>
-    <tr>
-      <th>sub_to_rac website  portfolio tracking system</th>
-      <td>0.102118</td>
-    </tr>
-    <tr>
-      <th>sub_to_enron advisory council presentations</th>
-      <td>0.090265</td>
-    </tr>
-    <tr>
-      <th>sub_to_la times article</th>
-      <td>0.076118</td>
-    </tr>
-    <tr>
-      <th>sub_to_executive committee meeting  monday september 25</th>
-      <td>0.061901</td>
-    </tr>
-    <tr>
-      <th>sub_to_executive committee meeting  monday october 16  new sec rules</th>
-      <td>0.060764</td>
-    </tr>
-    <tr>
-      <th>sub_to_policy committee review  analystassociate program prc process</th>
-      <td>0.013406</td>
-    </tr>
-  </tbody>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Effect-of-the-new-features">Effect of the new features<a class="anchor-link" href="#Effect-of-the-new-features">&#182;</a></h2><p>The email word features extracted from the email texts are neglected by all classifiers in the optimal found parameter setting.</p>
+<p>The subject feature are used by the kNN algorithm. With only the original financial and email count features the best parameter setting fors for the three classifiers is shown in the following table.</p>
+<table>
+<thead><tr>
+<th>Classifier</th>
+<th>Financial</th>
+<th>Email count</th>
+<th>Parameter 1</th>
+<th>Setting</th>
+<th>Parameter 2</th>
+<th>Setting</th>
+<th>Parameter 3</th>
+<th>Setting</th>
+<th>F1 Score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RF</td>
+<td>Yes</td>
+<td>No</td>
+<td><code>min_samples_leaf</code></td>
+<td>1, 2</td>
+<td><code>n_estimators</code></td>
+<td>20, 5</td>
+<td><code>min_samples_split</code></td>
+<td>4</td>
+<td>0.225 (std: 0.361)</td>
+</tr>
+<tr>
+<td>SVC</td>
+<td>No</td>
+<td>Yes</td>
+<td><code>class_weight</code></td>
+<td><code>"balanced"</code></td>
+<td><code>kernel</code></td>
+<td><code>"linear"</code></td>
+<td><code>C</code></td>
+<td>0.8, 1.0</td>
+<td>0.492 (std: 0.107)</td>
+</tr>
+<tr>
+<td>kNN</td>
+<td>Yes</td>
+<td>Yes</td>
+<td><code>n_neighbors</code></td>
+<td>1</td>
+<td><code>metric</code></td>
+<td><code>"manhattan"</code></td>
+<td><code>weights</code></td>
+<td><code>"distance"</code>, <code>"uniform"</code></td>
+<td>0.347 (std: 0.390)</td>
+</tr>
+</tbody>
 </table>
-</div>
-</div>
+<p>For the Random Forest (RF) classifiers either <code>min_samples_leaf</code>= 1 and <code>n_estimators</code>= 20 <strong>or</strong> <code>min_samples_leaf</code>= 2 and <code>n_estimators</code>= 5 yields the given F1 score.</p>
+<p>The best performing classifier in this case would be SVC with an F1 score of .492. This is .029 or 5.6 % below the F1 score achieved with the subject features and the kNN classifier.</p>
 
 </div>
-
 </div>
 </div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>With the given setup (e.g. different random states show different results), the most important feature is the feature <code>sub_from_organizational announcement</code> which is non-zero if the given employee has sent an email with this subject line. The second most important feature is the feature <code>sub_to_advisory council presentations</code>, which indicates, that the given employee received an email with this subject line, which is presumably more likely to happen for board members.</p>
-
+<h2 id="Other-ideas">Other ideas<a class="anchor-link" href="#Other-ideas">&#182;</a></h2>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Other-ideas">Other ideas<a class="anchor-link" href="#Other-ideas">&#194;&#182;</a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>I had some hard time thinking about whether it is valid to use a feature like <code>from_poi_to_this_person</code> in training. These features include information about other POIs in the sample but not for the current data set. Therefore, I think it is valid. These features evolve from network analyses. I might be interesting to look deeper into the networks of Enron employees: How strong a connections between people e.g. based on the number of emails exchanged. A good starting point might be <a href="http://arxiv.org/abs/0810.1355">Jure Leskovec, Kevin J. Lang, Anirban Dasgupta, Michael W. Mahoney</a>.</p>
+<p>I had some hard time thinking about whether it is valid to use a feature like <code>from_poi_to_this_person</code> in training. These features include information about other POIs in the sample but not for the current data set. Therefore, I think it is valid.</p>
+<p>These features evolve from network analyses. It might be interesting to look deeper into the networks of Enron employees: How strong a connections between people e.g. based on the number of emails exchanged. A good starting point might be <a href="http://arxiv.org/abs/0810.1355">Jure Leskovec, Kevin J. Lang, Anirban Dasgupta, Michael W. Mahoney</a>.</p>
 
 </div>
 </div>
@@ -18345,8 +18936,4 @@ Accuracy:  0.837209302326</code></pre>
     </div>
   </div>
 </body>
-
- 
-
-
 </html>
